@@ -2,8 +2,14 @@
 pragma solidity ^0.8;
 
 contract Rating {
-    // functions needed
 
+    // storage for ratings by itemId
+    mapping(uint256 => uint8[]) ratings;
+
+    // stores a mapping from user address -> itemId -> user rating for itemId
+    mapping(address => mapping(uint256 => uint8)) userRating;
+
+    // functions needed
     function registerItem(string memory data) returns(uint256 itemId) {
 
     }
@@ -16,8 +22,8 @@ contract Rating {
 
     }
 
-    function getRating(uint 256 itemId, address _user) returns(uint8 _rating) {
-
+    function getRating(uint 256 _itemId, address _user) external returns(uint8 _rating) {
+        _rating = userRating[msg.sender][_itemId];
     }
 
 }

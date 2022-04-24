@@ -1,29 +1,25 @@
-import * as React from 'react';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { Toolbar, Button, Box } from '@mui/material';
 
-interface HeaderProps {}
+import { connectWallet, useWallet } from '../apis/use_wallet';
+
+interface HeaderProps { }
 
 export default function Header(props: HeaderProps) {
   const { } = props;
+  const { currentAccount, setCurrentAccount } = useWallet();
 
   return (
-    <React.Fragment>
+    <Box>
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        Vlike demo
-        <Typography
-          component="h2"
-          variant="h5"
-          color="inherit"
-          align="center"
-          noWrap
-          sx={{ flex: 1 }}
-        >
-        </Typography>
-        <Button variant="outlined" size="small">
-          connect wallet
-        </Button>
+        Demo for Vlike
+        <Box sx={{ flex: 1 }} />
+        {currentAccount ? (
+          <Button variant='outlined'>
+            {`${currentAccount.slice(0, 5)}...${currentAccount.slice(38)}`}
+          </Button>
+        ) : <Button variant='outlined' onClick={() => { connectWallet(setCurrentAccount) }} > connect </Button>
+        }
+
       </Toolbar>
       <Toolbar
         component="nav"
@@ -31,6 +27,6 @@ export default function Header(props: HeaderProps) {
         sx={{ justifyContent: 'space-between', overflowX: 'auto' }}
       >
       </Toolbar>
-    </React.Fragment>
+    </Box>
   );
 }

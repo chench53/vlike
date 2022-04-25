@@ -59,5 +59,4 @@ contract Rating {
     function getRating(uint256 _itemId, address _user) external returns(bool _rating) {
         _rating = userRating[msg.sender][_itemId];
     }
-
 }

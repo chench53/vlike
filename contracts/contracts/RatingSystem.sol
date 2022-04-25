@@ -7,7 +7,7 @@ contract Rating {
 
     using SafeMath for uint256;
     
-    uint256 itemIdCounter = 1;
+    uint256 public itemIdCounter = 1;
 
     struct Item {
         uint256 itemID; 
@@ -33,11 +33,12 @@ contract Rating {
 
     // consider only owner visibility. Do users register items that they want to rate
     // or do we provide the items? We only want an item to be registered once. 
-    function registerItem(bytes32 _urlData) public returns(uint256 itemId) {
+    function registerItem(bytes32 _urlData) public returns(bool success) {
         require(url_IDMapping[_urlData] == 0, 'This item is already registered');
         itemMapping[itemIdCounter] = Item(itemIdCounter, _urlData, 0);
         url_IDMapping[_urlData] = itemIdCounter;
         itemIdCounter = itemIdCounter.add(1);
+        success = true;
     }
 
 

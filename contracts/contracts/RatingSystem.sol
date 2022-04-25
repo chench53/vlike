@@ -16,7 +16,7 @@ contract Rating {
         uint256 ratingsCount = 0;
     }
 
-    // storage for ratings by urlData
+    // storage for ratings by itemID
     mapping(uint256 => Item) itemMapping;
 
     // stores a mapping from user address -> itemId -> user rating for itemId
@@ -46,10 +46,8 @@ contract Rating {
         ratingsCount = ratingsCount.add(1);
     }
 
-    function getRatingCount(uint256 itemId, uint8[] scores) returns (uint256 scoreCount) {
-        uint256 count = 0;
-        for(uint256 i = 0; i < scores.length(); i++){
-        }
+    function getRatingCount(uint256 _itemId) returns (uint256 _count) {
+        _count = itemMapping[_itemId].ratingsCount;
     }
 
     // With this function, do we plan on calling it as the admin or is 

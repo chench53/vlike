@@ -11,13 +11,14 @@ contract Rating {
 
     struct Item {
         uint256 itemID; 
-        bytes32 urlData;
+        // bytes32 urlData;
+        string urlData;
         uint256 ratingsCount;
     }
 
     struct RatingByUser {
-        bool rating;
         bool hasVoted;
+        bool rating;
     }
 
     // storage for Items by itemID
@@ -31,36 +32,39 @@ contract Rating {
     mapping(address => mapping(uint256 => RatingByUser)) userRating;
 
     // mapping from url to item Id
-    mapping(bytes32 => uint256) url_IDMapping;
+    mapping(string => uint256) url_IDMapping;
 
     // consider only owner visibility. Do users register items that they want to rate
     // or do we provide the items? We only want an item to be registered once. 
-    function registerItem(bytes32 _urlData) public returns(bool success) {
+    function registerItem(string memory _urlData) public returns(uint256 itemId) {
         require(url_IDMapping[_urlData] == 0, 'This item is already registered');
-        itemMapping[itemIdCounter] = Item(itemIdCounter, _urlData, 0);
+        Item memory item = Item(itemIdCounter, _urlData, 0);
+        itemMapping[itemIdCounter] = item;
         url_IDMapping[_urlData] = itemIdCounter;
         itemIdCounter = itemIdCounter.add(1);
-        success = true;
+        return item.itemID;
     }
 
 
     function rate(uint256 _itemId, bool _score) public {
         require(userRating[msg.sender][_itemId].hasVoted == false, 'Cannot vote twice!');
         userRating[msg.sender][_itemId].hasVoted = true;
+        userRating[msg.sender][_itemId].rating = _score;
         itemScores[_itemId].push(_score);
         itemMapping[_itemId].ratingsCount = itemMapping[_itemId].ratingsCount.add(1);
     }
 
-    function getRatingCount(uint256 _itemId) public returns (uint256 _count) {
+    function getRatingCount(uint256 _itemId) public view returns (uint256 _count) {
         _count = itemMapping[_itemId].ratingsCount;
     }
 
     // With this function, do we plan on calling it as the admin or is 
     // this a function that the user will call to see their previous
     // scoring of content.
-    function getRating(uint256 _itemId, address _user) external returns(RatingByUser memory _rating) {
+    function getRating(uint256 _itemId, address _user) public view returns(RatingByUser memory _rating) {
         _rating = userRating[_user][_itemId];
         // _rating = userRating[msg.sender][_itemId] 
         // use the commented out version if we want the user to call this function.
+        return _rating;
     }
 }

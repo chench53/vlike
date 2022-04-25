@@ -15,18 +15,20 @@ contract Rating {
         uint256 ratingsCount;
     }
 
+    struct RatingByUser {
+        bool rating;
+        bool hasVoted;
+    }
+
     // storage for Items by itemID
     mapping(uint256 => Item) itemMapping;
 
     // storage for scores for each itemID
     mapping(uint256 => bool[]) itemScores;
 
-    // stores a mapping from user address -> itemId -> user rating for itemId
-    mapping(address => mapping(uint256 => bool)) userRating;
-
-    // stores a bool that is true if a user has voted for a particular
-    // itemID and false otherwise.
-    mapping(address => mapping(uint256 => bool)) userHasVoted;
+    // stores a bool for the rating and bool for whether or not the user
+    // has voted. 
+    mapping(address => mapping(uint256 => RatingByUser)) userRating;
 
     // mapping from url to item Id
     mapping(bytes32 => uint256) url_IDMapping;
@@ -43,8 +45,8 @@ contract Rating {
 
 
     function rate(uint256 _itemId, bool _score) public {
-        require(userHasVoted[msg.sender][_itemId] == false, 'Cannot vote twice!');
-        userHasVoted[msg.sender][_itemId] = true;
+        require(userRating[msg.sender][_itemId].hasVoted == false, 'Cannot vote twice!');
+        userRating[msg.sender][_itemId].hasVoted = true;
         itemScores[_itemId].push(_score);
         itemMapping[_itemId].ratingsCount = itemMapping[_itemId].ratingsCount.add(1);
     }
@@ -56,8 +58,9 @@ contract Rating {
     // With this function, do we plan on calling it as the admin or is 
     // this a function that the user will call to see their previous
     // scoring of content.
-    function getRating(uint256 _itemId, address _user) external returns(bool _rating) {
-        _rating = userRating[msg.sender][_itemId];
+    function getRating(uint256 _itemId, address _user) external returns(RatingByUser memory _rating) {
+        _rating = userRating[_user][_itemId];
+        // _rating = userRating[msg.sender][_itemId] 
+        // use the commented out version if we want the user to call this function.
     }
-
 }

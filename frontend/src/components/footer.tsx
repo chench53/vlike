@@ -1,57 +1,61 @@
-import { Toolbar, IconButton, Box } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
+import { AppBar, IconButton, Box } from '@mui/material';
 import CycloneIcon from '@mui/icons-material/Cyclone';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
+
+interface BottomNavProps {
+  name: string,
+  icon: any,
+  href: string,
+}
+
+function BottomNavBtn(props: BottomNavProps) {
+  const Icon = props.icon;
+  return (
+    <IconButton href={props.href}>
+      <Icon color="action" />
+    </IconButton>
+  )
+}
+
 interface FooterProps { }
 
 export default function Footer(props: FooterProps) {
-    const { } = props;
-    return (
-        <> 
-            <AppBar position="fixed" color="transparent" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0, maxHeight: 75}}>
-                
-                <Box sx={{ marginTop: 0, marginLeft: 3 }} >
-                    <p>&copy; Vlike 2022</p>
-                    <IconButton onClick={() => {
-                        window.location.href = 'https://www.youtube.com/watch?v=lRba55HTK0Q&t=3s';
-                    }} sx={{
-                        marginLeft: 15, marginTop: -10, borderColor: 'divider',
-                    }} >
-                        <YouTubeIcon color="action" fontSize="large"/>  
-                    </IconButton>
-                    <IconButton onClick={() => {
-                        window.location.href = 'https://chench53.gitbook.io/hackathon/';
-                    }} sx={{
-                        marginLeft: 2, marginTop: -10, borderColor: 'divider',
-                    }} >
-                        <CycloneIcon color="action" fontSize="large" />
-                    </IconButton>
-                    <IconButton onClick={() => {
-                        window.location.href = 'https://github.com/chench53/vlike';
-                    }} sx={{
-                        marginLeft: 2, marginTop: -10, borderColor: 'divider',
-                    }} >
-                        <GitHubIcon color="action" fontSize="large" />
-                    </IconButton>
-                </Box>
-                
+  const { } = props;
 
-                
-                    
-                        
-                    
-            </AppBar>
-            
-            <Toolbar
-                component="nav"
-                variant="dense"
-                sx={{ overflowX: 'auto' }}
-            >
-            </Toolbar>
-            
-        </>
+  const bottomNavBtnData = [
+    {
+      name: 'youtube',
+      icon: YouTubeIcon,
+      href: 'https://www.youtube.com/watch?v=lRba55HTK0Q'
+    },
+    {
+      name: 'gitbook',
+      icon: CycloneIcon,
+      href: 'https://chench53.gitbook.io/hackathon/'
+    },
+    {
+      name: 'github',
+      icon: GitHubIcon,
+      href: 'https://github.com/chench53/vlike'
+    },
+  ]
 
-    );
+  return (
+    <AppBar position="fixed" color="transparent" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0, maxHeight: 75 }}>
+      <Box sx={{ marginLeft: 4, display: 'flex'}} >
+        <p>&copy; Vlike 2022</p>
+        <Box sx={{ display: 'flex', gap: 1, marginLeft: 4 }}>
+          {
+            bottomNavBtnData.map(x => {
+              return (
+                <BottomNavBtn key={x.name} name={x.name} icon={x.icon} href={x.href}></BottomNavBtn>
+              )
+            })
+          }
+        </Box>
+      </Box>
+    </AppBar>
+  );
 }

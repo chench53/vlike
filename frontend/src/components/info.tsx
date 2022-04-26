@@ -4,28 +4,26 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 import { useWallet } from '../apis/use_wallet';
+import { getRatingCount } from '../apis/ethereum';
 
 interface InfoProps { }
 
 export default function Info(props: InfoProps) {
   const { } = props;
-  const [rating, setRating] = useState({
-    likeCount: 0, dislikeCount: 0
-  })
   const [userRated, setUserRated] = useState(false)
+  const [ratingCount, setRatingCount] = useState([0, 0])
   const { currentAccount, setCurrentAccount } = useWallet();
+
+
+  useEffect(() => {
+    getRatingCount(1).then(data => {
+      console.log(data);
+      setRatingCount([data[0], data[1]])
+    })
+  }, [])
 
   function rate(score: number) {
     console.log(currentAccount)
-    if (score === 255) {
-      setRating({
-        likeCount: rating.likeCount + 1, dislikeCount: 0
-      })
-    } else if (score === 0) {
-      setRating({
-        likeCount: 0, dislikeCount: rating.dislikeCount + 1
-      })
-    }
     setUserRated(true);
   }
 
@@ -35,16 +33,16 @@ export default function Info(props: InfoProps) {
       'justify-content': 'end'
     }}>
       <Box sx={{ 'margin-right': '12px' }}>
-        <IconButton disabled={userRated || !currentAccount} onClick={()=>rate(255)}>
+        <IconButton disabled={userRated || !currentAccount} onClick={()=>rate(1)}>
           <ThumbUpIcon />
         </IconButton>
-        {rating.likeCount}
+        {ratingCount[1]}
       </Box>
       <Box>
         <IconButton disabled={userRated || !currentAccount} onClick={()=>rate(0)}>
           <ThumbDownIcon />
         </IconButton>
-        {rating.dislikeCount}
+        {ratingCount[0]}
       </Box>
     </Box>
   );

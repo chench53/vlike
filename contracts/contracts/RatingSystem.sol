@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
 contract Rating {
 
-    using SafeMath for uint256;
-    
     uint256 public itemIdCounter = 1;
 
     struct Item {
         uint256 itemID; 
         // bytes32 urlData;
         string urlData;
-        uint256 ratingsCount;
+        uint256 likeCount;
+        uint256 dislikeCount;
+        uint256 totalRatingCount;
     }
 
     struct RatingByUser {
@@ -36,35 +34,42 @@ contract Rating {
 
     // consider only owner visibility. Do users register items that they want to rate
     // or do we provide the items? We only want an item to be registered once. 
-    function registerItem(string memory _urlData) public returns(uint256 itemId) {
+    function registerItem(string memory _urlData) public returns(uint256) {
         require(url_IDMapping[_urlData] == 0, 'This item is already registered');
-        Item memory item = Item(itemIdCounter, _urlData, 0);
+        Item memory item = Item(itemIdCounter, _urlData, 0, 0, 0);
         itemMapping[itemIdCounter] = item;
         url_IDMapping[_urlData] = itemIdCounter;
-        itemIdCounter = itemIdCounter.add(1);
-        return item.itemID;
+        itemIdCounter += 1;
+        return url_IDMapping[_urlData];
     }
 
-
-    function rate(uint256 _itemId, bool _score) public {
+    function rate(uint256 _itemId, bool _score) public returns(bool success){
         require(userRating[msg.sender][_itemId].hasVoted == false, 'Cannot vote twice!');
         userRating[msg.sender][_itemId].hasVoted = true;
         userRating[msg.sender][_itemId].rating = _score;
         itemScores[_itemId].push(_score);
-        itemMapping[_itemId].ratingsCount = itemMapping[_itemId].ratingsCount.add(1);
+        itemMapping[_itemId].totalRatingCount += 1;
+        if (_score == true) {
+            itemMapping[_itemId].likeCount += 1;
+        }
+        else {
+            itemMapping[_itemId].dislikeCount += 1;
+        }
+        success = true;
     }
 
-    function getRatingCount(uint256 _itemId) public view returns (uint256 _count) {
-        _count = itemMapping[_itemId].ratingsCount;
+    function getRatingCount(uint256 _itemId) public view returns (uint256 dCount, uint256 lCount) {
+        lCount = itemMapping[_itemId].likeCount;
+        dCount = itemMapping[_itemId].dislikeCount;
+        return (dCount, lCount);
     }
 
-    // With this function, do we plan on calling it as the admin or is 
-    // this a function that the user will call to see their previous
-    // scoring of content.
-    function getRating(uint256 _itemId, address _user) public view returns(RatingByUser memory _rating) {
-        _rating = userRating[_user][_itemId];
-        // _rating = userRating[msg.sender][_itemId] 
-        // use the commented out version if we want the user to call this function.
+    function getUserRating(uint256 _itemId) public view returns(RatingByUser memory _rating) {
+        _rating = userRating[msg.sender][_itemId];
         return _rating;
+    }
+
+    function adminGetUserRating(uint256 _itemId, address _user) public view returns(RatingByUser memory _rating){
+        _rating = userRating[_user][_itemId];
     }
 }

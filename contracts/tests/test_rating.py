@@ -26,16 +26,18 @@ def test_rating():
     itemId = tx.return_value
     assert itemId == 1
 
-    ratingInfo = rating_contract.getRating(itemId, user1, {"from": user1})
+    # rating info on (hasVoted, rating)
+    ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})
     assert ratingInfo == (False, False)
 
     # rate
     rating = 1
-    rating_contract.rate(itemId, 1, {"from": user1}).wait(1)
+    rating_contract.rate(itemId, 0, {"from": user1}).wait(1)
 
-    ratingInfo = rating_contract.getRating(itemId, user1, {"from": user1})
-    assert ratingInfo == (True, True)
+    # rating info on (hasVoted, rating)
+    ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})
+    assert ratingInfo == (True, False)
 
     # count on dislike/like
     ratingCount = rating_contract.getRatingCount(itemId, {"from": user1})
-    assert ratingCount == (0, 1)
+    assert ratingCount == (1, 0)

@@ -4,27 +4,37 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 import { useWallet } from '../apis/use_wallet';
-import { getRatingCount } from '../apis/ethereum';
+import { getRatingCount, getUserRating, rate } from '../apis/ethereum';
 
-interface InfoProps { }
+const { ethereum } = window;
+
+interface InfoProps {
+  itemId: number
+}
 
 export default function Info(props: InfoProps) {
-  const { } = props;
-  const [userRated, setUserRated] = useState(false)
+  const { itemId } = props;
+  const [hasRated, setHasRated] = useState(false);
   const [ratingCount, setRatingCount] = useState([0, 0])
   const { currentAccount, setCurrentAccount } = useWallet();
 
-
   useEffect(() => {
-    getRatingCount(1).then(data => {
-      console.log(data);
+    fetchCurrentRatingInfo()
+  }, [currentAccount])
+  
+  function fetchCurrentRatingInfo() {    
+    getRatingCount(itemId).then(data => {
       setRatingCount([data[0], data[1]])
     })
-  }, [])
+    getUserRating(itemId).then(data => {
+      setHasRated(data[0]);
+    })
+  }
 
-  function rate(score: number) {
-    console.log(currentAccount)
-    setUserRated(true);
+  function giveRating(score: number) {
+    rate(itemId, score).then(() => {
+      fetchCurrentRatingInfo()
+    })
   }
 
   return (
@@ -33,13 +43,13 @@ export default function Info(props: InfoProps) {
       'justify-content': 'end'
     }}>
       <Box sx={{ 'margin-right': '12px' }}>
-        <IconButton disabled={userRated || !currentAccount} onClick={()=>rate(1)}>
+        <IconButton disabled={hasRated || !ethereum.selectedAddress} onClick={()=>giveRating(1)}>
           <ThumbUpIcon />
         </IconButton>
         {ratingCount[1]}
       </Box>
       <Box>
-        <IconButton disabled={userRated || !currentAccount} onClick={()=>rate(0)}>
+        <IconButton disabled={hasRated|| !ethereum.selectedAddress} onClick={()=>giveRating(0)}>
           <ThumbDownIcon />
         </IconButton>
         {ratingCount[0]}

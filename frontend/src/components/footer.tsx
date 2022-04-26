@@ -43,7 +43,7 @@ export default function Footer(props: FooterProps) {
   ]
 
   return (
-    <AppBar position="fixed" color="transparent" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0, maxHeight: 75 }}>
+    <AppBar position="fixed" color="transparent" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0, }}>
       <Box sx={{ marginLeft: 4, display: 'flex'}} >
         <p>&copy; Vlike 2022</p>
         <Box sx={{ display: 'flex', gap: 1, marginLeft: 4 }}>

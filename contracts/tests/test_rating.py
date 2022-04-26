@@ -9,10 +9,13 @@ from brownie import (
 )
 import pytest
 
-from scripts.tools import get_account
+from scripts.tools import get_account, LOCAL_BLOCKCHAIN
 
 
 def test_rating():
+    if network.show_active() not in LOCAL_BLOCKCHAIN:
+        pytest.skip()
+
     account = get_account()
     rating_contract = Rating.deploy({"from": account})
 

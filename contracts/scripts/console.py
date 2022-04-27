@@ -10,7 +10,7 @@ import pytest
 
 from scripts.tools import get_account
 
-def main():
+def abi():
     path = '../frontend/src/apis/abi/rating.json'
     with open(path, 'r') as f:
         abi = json.load(f)
@@ -20,3 +20,15 @@ def main():
     print(user1)
     ratingInfo = contract.getUserRating(1, {"from": get_account(1)})
     print(ratingInfo)
+
+def reg():
+    rating = Rating[-1]
+    url = "https://www.youtube.com/embed/lRba55HTK0Q"
+    tx = rating.registerItem(url, {"from": get_account()})
+    tx.wait(1)
+    itemId = tx.return_value
+    print(itemId)
+
+
+def main():
+    reg()

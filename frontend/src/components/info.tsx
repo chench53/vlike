@@ -44,7 +44,7 @@ export default function Info(props: InfoProps) {
     }}>
       <Box sx={{ 'margin-right': '12px' }}>
         <IconButton disabled={hasRated || !ethereum.selectedAddress} onClick={()=>giveRating(1)}>
-          <ThumbUpIcon />
+          <ThumbUpIcon/>
         </IconButton>
         {ratingCount[1]}
       </Box>

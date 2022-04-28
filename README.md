@@ -65,7 +65,7 @@ Then you can interact with local contracts in this local web page.
 
 ## Deployment
 
-To deployed this project:
+To deploy this project:
 
 1. Deployed Rating contact on rinkeby testnet. In /contracts: 
 
@@ -80,7 +80,7 @@ To deployed this project:
     REACT_APP_CONTRACT_RATING={the Rating contract address}
     ```
 
-    Since .env.local has higher priority than .env, the better practise is to assign a separate deployment server with different .env.local.
+    Since .env.local has higher priority than .env, the better practice is to assign a separate deployment server with different .env.local.
 
 3. Build frontend to the /frontend folder:
 

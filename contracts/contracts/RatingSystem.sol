@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/governance/TimelockController.sol";
+
+import "./VlikeToken.sol";
+
 contract Rating {
 
     uint256 public itemIdCounter = 1;
+    VlikeToken public token;
+    bool public tokenEnabled;
 
     struct Item {
         uint256 itemID; 
@@ -12,6 +18,7 @@ contract Rating {
         uint256 likeCount;
         uint256 dislikeCount;
         uint256 totalRatingCount;
+        uint256 balance;
     }
 
     struct RatingByUser {
@@ -32,11 +39,30 @@ contract Rating {
     // mapping from url to item Id
     mapping(string => uint256) url_IDMapping;
 
+    event rateEvent(
+        uint256 itemId,
+        bool rating
+    );
+
+    constructor(
+        VlikeToken _token,
+        bool enableTokenAtInit
+    ) {
+        token = _token;
+        if (enableTokenAtInit == true) {
+            enableToken();
+        }
+    }
+
+    function enableToken() public {
+        tokenEnabled = true;
+    }
+
     // consider only owner visibility. Do users register items that they want to rate
     // or do we provide the items? We only want an item to be registered once. 
     function registerItem(string memory _urlData) public returns(uint256) {
         require(url_IDMapping[_urlData] == 0, 'This item is already registered');
-        Item memory item = Item(itemIdCounter, _urlData, 0, 0, 0);
+        Item memory item = Item(itemIdCounter, _urlData, 0, 0, 0, 0);
         itemMapping[itemIdCounter] = item;
         url_IDMapping[_urlData] = itemIdCounter;
         itemIdCounter += 1;
@@ -54,7 +80,14 @@ contract Rating {
         }
         else {
             itemMapping[_itemId].dislikeCount += 1;
-        }
+        }   
+
+        if (tokenEnabled == true) {
+            token.transfer(address(token), _calculateRatingStake(_itemId, _score));
+        }   
+
+        emit rateEvent(_itemId, _score);
+
         success = true;
     }
 
@@ -71,5 +104,13 @@ contract Rating {
 
     function adminGetUserRating(uint256 _itemId, address _user) public view returns(RatingByUser memory _rating){
         _rating = userRating[_user][_itemId];
+    }
+
+    function _calculateRatingStake(uint256 _itemId, bool _score) internal returns (uint256 stakeAmount) {
+        return _ether(1);
+    }
+    // ether to wei
+    function _ether(uint256 amountInEther) internal returns (uint256 amountInWei) {
+        return amountInEther * 10 **18;
     }
 }

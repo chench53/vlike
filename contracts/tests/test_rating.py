@@ -10,6 +10,7 @@ from brownie import (
 import pytest
 
 from scripts.tools import get_account, LOCAL_BLOCKCHAIN
+from scripts.deploy import deplopy_contract, deplopy_all, _setup
 
 
 def test_rating():
@@ -17,17 +18,11 @@ def test_rating():
         pytest.skip()
 
     account = get_account()
-    rating_contract = Rating.deploy({"from": account})
-
     user1 = get_account(1)
     user2 = get_account(2)
 
-    # registerItem
-    url = "https://www.youtube.com/embed/lRba55HTK0Q"
-    tx = rating_contract.registerItem(url, {"from": account})
-    tx.wait(1)
-    itemId = tx.return_value
-    assert itemId == 1
+    _, rating_contract = deplopy_all()
+    itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
 
     # rating info on (hasVoted, rating)
     ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})

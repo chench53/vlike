@@ -3,7 +3,7 @@ from web3 import Web3
 
 FORKED_LOCAL_BLOCKCHAIN = ['mainnet-fork', 'mainnet-fork-dev']
 LOCAL_BLOCKCHAIN = ['development', 'ganache-local']
-
+INITIAL_SUPPLY = 1000000000
 
 def get_account(index=None, id=None):
     if index:

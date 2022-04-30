@@ -4,12 +4,12 @@ pragma solidity 0.8.0;
 
 import "./RatingSystem.sol";
 
-contract RatingFactory is RatingSystem {
+contract RatingFactory is Rating {
 
-    RatingSystem[] public ratingSystemArray;
+    Rating[] public ratingArray;
 
     function createRatingSystemContract() public {
-        RatingSystem ratingSystem = new RatingSystem();
-        RatingSystemArray.push(ratingSystem);
+        Rating rating = new Rating();
+        ratingArray.push(rating);
     }
 }

@@ -3,13 +3,23 @@
 pragma solidity 0.8.0;
 
 import "./RatingSystem.sol";
+import "./VlikeToken.sol";
 
-contract RatingFactory is RatingSystem {
+contract RatingFactory {
+    Rating[] public ratingArray;
+    VlikeToken public token;
+    bool public tokenEnabled;
+    bool public enableTokenAtInit;
 
-    RatingSystem[] public ratingSystemArray;
+    function enableToken() public {
+        tokenEnabled = true;
+    }
 
     function createRatingSystemContract() public {
-        RatingSystem ratingSystem = new RatingSystem();
-        RatingSystemArray.push(ratingSystem);
+        Rating rating = new Rating(token, enableTokenAtInit);
+        ratingArray.push(rating);
+        if (enableTokenAtInit == true) {
+            enableToken();
+        }
     }
 }

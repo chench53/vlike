@@ -13,7 +13,7 @@ from brownie import (
 import pytest
 from web3 import constants, Web3
 
-from scripts.tools import get_account, LOCAL_BLOCKCHAIN
+from scripts.tools import get_account, get_contract, LOCAL_BLOCKCHAIN
 from scripts.deploy import deplopy_contract, deplopy_all, _setup
 
 
@@ -57,17 +57,23 @@ def test_rating_with_tokens():
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
-    # print(stake_amount, vote_weight)
     token_contract.approve(rating_contract, stake_amount, {'from': user1})
-    # print(token_contract.balanceOf(user1))
-    # breakpoint()
     rating = 0
     with pytest.raises(exceptions.VirtualMachineError, match='transfer amount exceeds balance'):
         rating_contract.rate(itemId, rating, {"from": user1}).wait(1)
 
     token_contract.transfer(user1, Web3.toWei(10, 'ether'), {'from': account}).wait(1)
-    rating_contract.rate(itemId, rating, {"from": user1}).wait(1)
+    tx = rating_contract.rate(itemId, rating, {"from": user1})
 
+    request_id = tx.events["stakeEvent"]["requestId"]
+
+    STATIC_RNG = 666
+
+    get_contract("vrf_coordinator").callBackWithRandomness(
+        request_id, STATIC_RNG, rating_contract.address, {"from": account}
+    )
+    breakpoint()
+    print(rating_contract.itemPoolMapping(1))
 
 def test_rating_factory():
     if network.show_active() not in LOCAL_BLOCKCHAIN:

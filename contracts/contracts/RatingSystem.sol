@@ -16,8 +16,10 @@ contract Rating is VRFConsumerBase {
     bytes32 public keyhash;
 
     struct StakeInfo {
+        uint256 itemId;
         address rater;
         uint256 stakeAmount;
+        uint256 voteWeight;
         uint256 votes;
     }
 
@@ -41,11 +43,11 @@ contract Rating is VRFConsumerBase {
     }
 
     // storage for Items by itemID
-    mapping(uint256 => Item) itemMapping;
+    mapping(uint256 => Item) public itemMapping;
 
-    mapping(uint256 => Pool) itemPoolMapping;
-
-    mapping(bytes32 => uint256) randomRequestMapping;
+    mapping(uint256 => Pool) public itemPoolMapping;
+    // requestId => StakeInfo
+    mapping(bytes32 => StakeInfo) randomRequestMapping;
 
     // storage for scores for each itemID
     // mapping(uint256 => bool[]) itemScores;
@@ -58,14 +60,15 @@ contract Rating is VRFConsumerBase {
     mapping(string => uint256) url_IDMapping;
 
     event rateEvent(
-        address rater,
         uint256 itemId,
+        address rater,
         bool rating
     );
 
     event stakeEvent(
+        uint256 itemId,
         address rater,
-        uint256 itemId
+        bytes32 requestId
     );
 
     constructor(
@@ -112,9 +115,12 @@ contract Rating is VRFConsumerBase {
             (uint256 stakeAmount, uint256 voteWeight) = calculateRatingStake(_itemId);
             token.transferFrom(msg.sender, address(this), stakeAmount);
             itemPoolMapping[_itemId].balance += stakeAmount;
-            itemPoolMapping[_itemId].stakeInfos.push(StakeInfo(msg.sender, stakeAmount, 0));
+            StakeInfo memory stakeInfo = StakeInfo(_itemId, msg.sender, stakeAmount, voteWeight, 0);
+            itemPoolMapping[_itemId].stakeInfos.push(stakeInfo);
             bytes32 requestId = requestRandomness(keyhash, fee);
-            randomRequestMapping[requestId] = _itemId;
+            randomRequestMapping[requestId] = stakeInfo;
+
+            emit stakeEvent(_itemId, msg.sender, requestId);
         }
 
         userRating[msg.sender][_itemId].hasVoted = true;
@@ -128,7 +134,7 @@ contract Rating is VRFConsumerBase {
             itemMapping[_itemId].dislikeCount += 1;
         }   
 
-        emit rateEvent(msg.sender, _itemId, _score);
+        emit rateEvent(_itemId, msg.sender, _score);
 
         success = true;
     }
@@ -164,5 +170,7 @@ contract Rating is VRFConsumerBase {
 
     function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
         require(_randomness > 0, "random not found");
+        StakeInfo memory stakeInfo = randomRequestMapping[_requestId];
+        itemPoolMapping[stakeInfo.itemId].stakeInfos[0].votes += stakeInfo.voteWeight;
     }
 }

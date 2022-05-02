@@ -20,11 +20,10 @@ contract Rating is VRFConsumerBase {
         uint256 stakeAmount;
         uint256 votes;
     }
-    StakeInfo[] stakeInfos;
 
     struct Pool {
         uint256 balance;
-        // StakeInfo[] stakeInfos;
+        StakeInfo[] stakeInfos;
     }
 
     struct Item {
@@ -34,7 +33,6 @@ contract Rating is VRFConsumerBase {
         uint256 likeCount;
         uint256 dislikeCount;
         uint256 totalRatingCount;
-        Pool pool;
     }
 
     struct RatingByUser {
@@ -44,6 +42,10 @@ contract Rating is VRFConsumerBase {
 
     // storage for Items by itemID
     mapping(uint256 => Item) itemMapping;
+
+    mapping(uint256 => Pool) itemPoolMapping;
+
+    mapping(bytes32 => uint256) randomRequestMapping;
 
     // storage for scores for each itemID
     // mapping(uint256 => bool[]) itemScores;
@@ -56,8 +58,14 @@ contract Rating is VRFConsumerBase {
     mapping(string => uint256) url_IDMapping;
 
     event rateEvent(
+        address rater,
         uint256 itemId,
         bool rating
+    );
+
+    event stakeEvent(
+        address rater,
+        uint256 itemId
     );
 
     constructor(
@@ -84,14 +92,12 @@ contract Rating is VRFConsumerBase {
     // or do we provide the items? We only want an item to be registered once. 
     function registerItem(string memory _urlData) public returns(uint256) {
         require(url_IDMapping[_urlData] == 0, 'This item is already registered');
-        StakeInfo[] storage _stakeInfos = stakeInfos;
         Item memory item = Item(
             itemIdCounter, 
             _urlData, 
             0, 
             0, 
-            0, 
-            Pool(0)
+            0
         );
         itemMapping[itemIdCounter] = item;
         url_IDMapping[_urlData] = itemIdCounter;
@@ -105,9 +111,10 @@ contract Rating is VRFConsumerBase {
         if (tokenEnabled == true) {
             (uint256 stakeAmount, uint256 voteWeight) = calculateRatingStake(_itemId);
             token.transferFrom(msg.sender, address(this), stakeAmount);
-            itemMapping[_itemId].pool.balance += stakeAmount;
-            // itemMapping[_itemId].pool.stakeInfos.push(msg.sender, );
+            itemPoolMapping[_itemId].balance += stakeAmount;
+            itemPoolMapping[_itemId].stakeInfos.push(StakeInfo(msg.sender, stakeAmount, 0));
             bytes32 requestId = requestRandomness(keyhash, fee);
+            randomRequestMapping[requestId] = _itemId;
         }
 
         userRating[msg.sender][_itemId].hasVoted = true;
@@ -121,7 +128,7 @@ contract Rating is VRFConsumerBase {
             itemMapping[_itemId].dislikeCount += 1;
         }   
 
-        emit rateEvent(_itemId, _score);
+        emit rateEvent(msg.sender, _itemId, _score);
 
         success = true;
     }

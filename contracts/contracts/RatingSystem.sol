@@ -11,6 +11,8 @@ contract Rating is VRFConsumerBase {
     uint256 public itemIdCounter = 1;
     VlikeToken public token;
     bool public tokenEnabled;
+    // lottery end
+    uint256 public dice;
     // chainlink
     uint256 public fee;
     bytes32 public keyhash;
@@ -22,10 +24,10 @@ contract Rating is VRFConsumerBase {
         uint256 voteWeight;
         uint256 votes;
     }
-
+    // may not need?
     struct Pool {
-        uint256 balance;
-        StakeInfo[] stakeInfos;
+        uint256 totalValue;
+        // StakeInfo[] stakeInfos;
     }
 
     struct Item {
@@ -45,16 +47,16 @@ contract Rating is VRFConsumerBase {
     // storage for Items by itemID
     mapping(uint256 => Item) public itemMapping;
 
-    mapping(uint256 => Pool) public itemPoolMapping;
+    mapping(uint256 => mapping(bool => StakeInfo[])) public itemPoolMapping;
     // requestId => StakeInfo
-    mapping(bytes32 => StakeInfo) randomRequestMapping;
+    mapping(bytes32 => StakeInfo) public randomRequestMapping;
 
     // storage for scores for each itemID
     // mapping(uint256 => bool[]) itemScores;
 
     // stores a bool for the rating and bool for whether or not the user
     // has voted. 
-    mapping(address => mapping(uint256 => RatingByUser)) userRating;
+    mapping(address => mapping(uint256 => RatingByUser)) public userRating;
 
     // mapping from url to item Id
     mapping(string => uint256) url_IDMapping;
@@ -71,14 +73,28 @@ contract Rating is VRFConsumerBase {
         bytes32 requestId
     );
 
+    event voteEvent(
+        uint256 itemId,
+        address voter,
+        uint256 votedIndex
+    );
+
+    event rewardEvent(
+        uint256 itemId,
+        address winner,
+        uint256 rewardAmount
+    );
+
     constructor(
         VlikeToken _token,
         bool enableTokenAtInit,
+        uint256 _dice,
         address _vrfCoordinator, 
         address _link,
         uint256 _fee,
         bytes32 _keyhash
     ) VRFConsumerBase(_vrfCoordinator, _link) {
+        dice = _dice;
         token = _token;
         fee = _fee;
         keyhash = _keyhash;
@@ -112,15 +128,7 @@ contract Rating is VRFConsumerBase {
         require(userRating[msg.sender][_itemId].hasVoted == false, 'Cannot vote twice!');
 
         if (tokenEnabled == true) {
-            (uint256 stakeAmount, uint256 voteWeight) = calculateRatingStake(_itemId);
-            token.transferFrom(msg.sender, address(this), stakeAmount);
-            itemPoolMapping[_itemId].balance += stakeAmount;
-            StakeInfo memory stakeInfo = StakeInfo(_itemId, msg.sender, stakeAmount, voteWeight, 0);
-            itemPoolMapping[_itemId].stakeInfos.push(stakeInfo);
-            bytes32 requestId = requestRandomness(keyhash, fee);
-            randomRequestMapping[requestId] = stakeInfo;
-
-            emit stakeEvent(_itemId, msg.sender, requestId);
+            stake(_itemId, _score);
         }
 
         userRating[msg.sender][_itemId].hasVoted = true;
@@ -137,6 +145,17 @@ contract Rating is VRFConsumerBase {
         emit rateEvent(_itemId, msg.sender, _score);
 
         success = true;
+    }
+
+    function stake(uint256 _itemId, bool _score) internal {
+        (uint256 stakeAmount, uint256 voteWeight) = calculateRatingStake(_itemId);
+        token.transferFrom(msg.sender, address(this), stakeAmount);
+        StakeInfo memory stakeInfo = StakeInfo(_itemId, msg.sender, stakeAmount, voteWeight, 0);
+        itemPoolMapping[_itemId][_score].push(stakeInfo);
+        bytes32 requestId = requestRandomness(keyhash, fee);
+        randomRequestMapping[requestId] = stakeInfo;
+
+        emit stakeEvent(_itemId, msg.sender, requestId);
     }
 
     function getRatingCount(uint256 _itemId) public view returns (uint256 dCount, uint256 lCount) {
@@ -160,17 +179,75 @@ contract Rating is VRFConsumerBase {
     }
 
     // ether to wei
-    function _ether(uint256 amountInEther) internal view returns (uint256 amountInWei) {
+    function _ether(uint256 amountInEther) internal pure returns (uint256 amountInWei) {
         return amountInEther * 10 **18;
     }
     // for debug
-    function debug(uint256 index) public view returns (uint256) {
+    function debug(uint256 index) public pure returns (uint256) {
         return _ether(1)/index;
     }
 
     function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
         require(_randomness > 0, "random not found");
         StakeInfo memory stakeInfo = randomRequestMapping[_requestId];
-        itemPoolMapping[stakeInfo.itemId].stakeInfos[0].votes += stakeInfo.voteWeight;
+        vote(stakeInfo, _randomness);
+        if (checkDice(_randomness)) {
+            uint256 itemId = stakeInfo.itemId;
+            reward(itemId, _randomness);
+            resetPool(itemId);
+        }
+    }
+
+    function checkDice(uint256 _randomness) internal view returns (bool) {
+        bool checked = _randomness % dice == 0;
+        return checked;
+    }
+
+    function vote(StakeInfo memory stakeInfo, uint256 _randomness) internal {
+        bool rating = userRating[stakeInfo.rater][stakeInfo.itemId].rating;
+        uint256 selectedIndex = _randomness % itemPoolMapping[stakeInfo.itemId][rating].length;
+        itemPoolMapping[stakeInfo.itemId][rating][selectedIndex].votes += stakeInfo.voteWeight;
+
+        emit voteEvent(stakeInfo.itemId, stakeInfo.rater, selectedIndex);
+    }
+
+    function reward(uint256 _itemid, uint256 _randomness) internal {
+        uint256 rewardAmount;
+        uint256 totalVotes;
+        for (uint256 i=0; i<itemPoolMapping[_itemid][false].length; i++) {
+            rewardAmount += itemPoolMapping[_itemid][false][i].stakeAmount;
+            totalVotes += itemPoolMapping[_itemid][false][i].votes;
+        }
+        for (uint256 i=0; i<itemPoolMapping[_itemid][true].length; i++) {
+            rewardAmount += itemPoolMapping[_itemid][true][i].stakeAmount;
+            totalVotes += itemPoolMapping[_itemid][false][i].votes;
+        }
+
+        uint256 cursor = _randomness % totalVotes; 
+        address winner = _findWinner(_itemid, cursor);
+        token.transfer(winner, rewardAmount);
+
+        emit rewardEvent(_itemid, winner, rewardAmount);
+    }
+
+    function _findWinner(uint256 _itemid, uint256 cursor) internal view returns (address winner) {
+        uint256 accumVotes;
+        for (uint256 i=0; i<itemPoolMapping[_itemid][false].length; i++) {
+            accumVotes += itemPoolMapping[_itemid][false][i].votes;
+            if (accumVotes > cursor) {
+                return itemPoolMapping[_itemid][false][i].rater;
+            }
+        }
+        for (uint256 i=0; i<itemPoolMapping[_itemid][true].length; i++) {
+            accumVotes += itemPoolMapping[_itemid][true][i].votes;
+            if (accumVotes > cursor) {
+                return itemPoolMapping[_itemid][true][i].rater;
+            }
+        }
+    }
+
+    function resetPool(uint256 _itemid) internal {
+        delete itemPoolMapping[_itemid][false];
+        delete itemPoolMapping[_itemid][true];
     }
 }

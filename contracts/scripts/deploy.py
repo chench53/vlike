@@ -16,7 +16,7 @@ def deplopy_contract(contact_container, *args):
     print("deployed {} contract at {}".format(contact_container._name, contract.address))
     return contract
 
-def deplopy_all(enable_token_at_init=False):
+def deplopy_all(enable_token_at_init=False, dice=100):
     token_contract = deplopy_contract(
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
@@ -25,6 +25,7 @@ def deplopy_all(enable_token_at_init=False):
         Rating, 
         token_contract, 
         enable_token_at_init,
+        dice,
         get_contract("vrf_coordinator").address,
         get_contract("link_token").address,
         config["networks"][network.show_active()]["fee"],

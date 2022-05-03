@@ -53,12 +53,12 @@ def move_blocks(amount):
         get_account().transfer(get_account(), 0)
     print(chain.height)
 
-def fund_with_link(contract_address, account=None, link_token=None, amount=0.1*10**18): # 0.1lnk
+def fund_with_link(contract_address, account=None, link_token=None, amount=10*10**18): # 0.1lnk
     account = account if account else  get_account()
     link_token = link_token if link_token else get_contract("link_token")
     tx = link_token.transfer(contract_address, amount, {"from": account})
     # link_token_contract = interface.LinkTokenInterface(link_token.address) # ?
     # tx = link_token_contract.transfer(contract_address, amount, {"from": account})
     tx.wait(1)
-    print("fund contract!")
+    print("contract fund with link")
     return tx

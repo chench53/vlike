@@ -19,12 +19,13 @@ contract RatingFactory {
     function createRatingSystemContract(
         VlikeToken token,
         bool enableTokenAtInit,
+        uint256 dice,
         address vrfCoordinator, 
         address link,
         uint256 fee,
         bytes32 keyhash
     ) public {
-        Rating rating = new Rating(token, enableTokenAtInit, vrfCoordinator, link, fee, keyhash);
+        Rating rating = new Rating(token, enableTokenAtInit, dice, vrfCoordinator, link, fee, keyhash);
         ratingArray.push(rating);
         // if (enableTokenAtInit == true) {
         //     enableToken();

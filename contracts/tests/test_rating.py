@@ -69,11 +69,30 @@ def test_rating_with_tokens():
 
     STATIC_RNG = 666
 
-    get_contract("vrf_coordinator").callBackWithRandomness(
+    tx_vrf = get_contract("vrf_coordinator").callBackWithRandomness(
         request_id, STATIC_RNG, rating_contract.address, {"from": account}
     )
-    breakpoint()
-    print(rating_contract.itemPoolMapping(1))
+
+    # breakpoint()
+    stake_info = rating_contract.itemPoolMapping(1, rating, 0)
+    assert stake_info[3: 5] == [1, 1] # voteWeight, votes
+    assert 'rewardEvent' not in tx.events
+
+    # user2
+    stake_amount2, vote_weight = rating_contract.calculateRatingStake(itemId)
+    token_contract.approve(rating_contract, stake_amount2, {'from': user2})
+    token_contract.transfer(user2, Web3.toWei(10, 'ether'), {'from': account}).wait(1)
+    tx = rating_contract.rate(itemId, rating, {"from": user2})
+
+    STATIC_RNG = 200
+
+    tx_vrf = get_contract("vrf_coordinator").callBackWithRandomness(
+        request_id, STATIC_RNG, rating_contract.address, {"from": account}
+    )
+    assert tx_vrf.events["rewardEvent"]['rewardAmount'] == stake_amount + stake_amount2
+    with pytest.raises(exceptions.VirtualMachineError): # pool is reset
+        rating_contract.itemPoolMapping(1, rating, 0)
+
 
 def test_rating_factory():
     if network.show_active() not in LOCAL_BLOCKCHAIN:

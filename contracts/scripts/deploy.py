@@ -1,5 +1,6 @@
 from brownie import (
     Rating,
+    RatingFactory,
     VlikeToken,
     config,
     network
@@ -31,7 +32,10 @@ def deplopy_all(enable_token_at_init=False, dice=100):
         config["networks"][network.show_active()]["fee"],
         config["networks"][network.show_active()]["keyhash"],
     )
-    return token_contract, rating_contract
+    rating_factory_contract = deplopy_contract(
+        RatingFactory
+    )
+    return token_contract, rating_contract, rating_factory_contract
 
 def _setup(rating_contract, string):
     account = get_account()
@@ -44,5 +48,5 @@ def _setup(rating_contract, string):
 
 
 def main():
-    token_contract, rating_contract = deplopy_all()
+    token_contract, rating_contract, rating_factory_contract = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")

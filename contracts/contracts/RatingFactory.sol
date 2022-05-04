@@ -8,14 +8,6 @@ import "./VlikeToken.sol";
 contract RatingFactory {
     Rating[] public ratingArray;
 
-    // VlikeToken public token;
-    // bool public tokenEnabled;
-    // bool public enableTokenAtInit;
-
-    // function enableToken() public {
-    //     tokenEnabled = true;
-    // }
-
     function createRatingSystemContract(
         VlikeToken token,
         bool enableTokenAtInit,
@@ -27,8 +19,5 @@ contract RatingFactory {
     ) public {
         Rating rating = new Rating(token, enableTokenAtInit, dice, vrfCoordinator, link, fee, keyhash);
         ratingArray.push(rating);
-        // if (enableTokenAtInit == true) {
-        //     enableToken();
-        // }
     }
 }

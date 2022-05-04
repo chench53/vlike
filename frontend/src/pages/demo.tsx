@@ -3,7 +3,7 @@ import { Grid, Container } from '@mui/material';
 import Player from '../components/player';
 import Info from '../components/info';
 
-export default function Home() {
+export default function Demo() {
 
   const item = {
     embedUrl: 'https://www.youtube.com/embed/lRba55HTK0Q',

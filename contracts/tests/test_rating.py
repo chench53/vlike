@@ -7,13 +7,16 @@ run a test function:
 
 from brownie import (
     Rating,
+    VlikeToken,
+    RatingFactory,
     exceptions,
     network,
+    config,
 )
 import pytest
 from web3 import constants, Web3
 
-from scripts.tools import get_account, get_contract, LOCAL_BLOCKCHAIN
+from scripts.tools import get_account, get_contract, LOCAL_BLOCKCHAIN, INITIAL_SUPPLY
 from scripts.deploy import deplopy_contract, deplopy_all, _setup
 
 
@@ -53,7 +56,7 @@ def test_rating_with_tokens():
     user1 = get_account(1)
     user2 = get_account(2)
 
-    token_contract, rating_contract = deplopy_all(True)
+    token_contract, rating_contract, _ = deplopy_all(True)
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
@@ -97,4 +100,23 @@ def test_rating_with_tokens():
 def test_rating_factory():
     if network.show_active() not in LOCAL_BLOCKCHAIN:
         pytest.skip()
+    token_contract = deplopy_contract(
+        VlikeToken, 
+        Web3.toWei(INITIAL_SUPPLY, 'ether'),
+    )
+    rating_factory_contract = deplopy_contract(
+        RatingFactory
+    )
+    tx = rating_factory_contract.createRatingSystemContract(
+        token_contract,
+        False,
+        100,
+        get_contract("vrf_coordinator").address,
+        get_contract("link_token").address,
+        config["networks"][network.show_active()]["fee"],
+        config["networks"][network.show_active()]["keyhash"],
+    )
+    tx.wait(1)
+    print(tx.return_value)
+    assert tx.return_value
     

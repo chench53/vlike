@@ -1,5 +1,5 @@
+import { Link, NavLink } from "react-router-dom";
 import { Toolbar, Button, Box } from '@mui/material';
-
 import { connectWallet, useWallet } from '../apis/use_wallet';
 
 interface HeaderProps { }
@@ -8,11 +8,40 @@ export default function Header(props: HeaderProps) {
   const { } = props;
   const { currentAccount, setCurrentAccount } = useWallet();
 
+  const NavTabs = [
+    {
+      name: 'demo',
+      to: '/demo',
+    }, 
+    {
+      name: 'devs',
+      to: '/devs',
+    },
+    {
+      name: 'FAQ',
+      to: '/faq',
+    }, 
+  ]
+
   return (
     <Box>
-      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        Demo for Vlike
+      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 4 }}>
+        Vlike
         <Box sx={{ flex: 1 }} />
+
+        {
+          NavTabs.map(x => {
+            return (
+              <Button>
+                <NavLink to={x.to} style={({isActive}) => ({
+                  textDecoration: 'none',
+                  color: isActive ? "gray" : ""
+                })}>{x.name}</NavLink>
+              </Button>
+            )
+          })
+        }
+
         {currentAccount ? (
           <Button variant='outlined'>
             {`${currentAccount.slice(0, 5)}...${currentAccount.slice(38)}`}
@@ -20,12 +49,6 @@ export default function Header(props: HeaderProps) {
         ) : <Button variant='outlined' onClick={() => { connectWallet(setCurrentAccount) }} > connect </Button>
         }
 
-      </Toolbar>
-      <Toolbar
-        component="nav"
-        variant="dense"
-        sx={{ justifyContent: 'space-between', overflowX: 'auto' }}
-      >
       </Toolbar>
     </Box>
   );

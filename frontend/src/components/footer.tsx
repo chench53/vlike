@@ -14,7 +14,7 @@ interface BottomNavProps {
 function BottomNavBtn(props: BottomNavProps) {
   const Icon = props.icon;
   return (
-    <IconButton target="_blank" href={props.href}>
+    <IconButton target="_blank"  rel="noreferrer" href={props.href}>
       <Icon color="action" />
     </IconButton>
   )
@@ -46,7 +46,7 @@ export default function Footer(props: FooterProps) {
   return (
     <AppBar position="fixed" color="transparent" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0, }}>
       <Box position='fixed' sx={{ marginLeft: 15, marginTop: 3, bottom: -10, height: 57, width: 57 }}>
-        <a target="_blank" href='https://chench53.gitbook.io/hackathon/'><img src={logo} /></a>
+        <a target="_blank"  rel="noreferrer" href='https://chench53.gitbook.io/hackathon/'><img src={logo} /></a>
       </Box>
       <Box sx={{ marginLeft: 4, display: 'flex'}} >
         <p>&copy; Vlike 2022</p>

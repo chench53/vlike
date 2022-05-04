@@ -20,7 +20,7 @@ interface RatingOptionProps {
 function RatingOption(props: RatingOptionProps) {
   const { hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon } = props;
   const Icon = icon;
-  console.log(`${myRating}  ${ratingOptionValue}`)
+  // console.log(`${myRating}  ${ratingOptionValue}`)
   return (
     <Box>
       <IconButton disabled={hasRated || !ethereum.selectedAddress} onClick={() => giveRating(ratingOptionValue)}>

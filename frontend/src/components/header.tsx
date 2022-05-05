@@ -32,7 +32,7 @@ export default function Header(props: HeaderProps) {
         {
           NavTabs.map(x => {
             return (
-              <Button>
+              <Button key={x.name}>
                 <NavLink to={x.to} style={({isActive}) => ({
                   textDecoration: 'none',
                   color: isActive ? "gray" : ""

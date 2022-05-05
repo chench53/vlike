@@ -1,0 +1,45 @@
+{
+  "dependencies": [
+    "OpenZeppelin/openzeppelin-contracts@4.2.0",
+    "smartcontractkit/chainlink-brownie-contracts@0.2.1"
+  ],
+  "compiler": {
+    "solc": {
+      "remappings": [
+        "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.2.0",
+        "@chainlink=smartcontractkit/chainlink-brownie-contracts@0.2.1"
+      ]
+    }
+  },
+  "dotenv": ".env",
+  "dev_deployment_artifacts": true,
+  "networks": {
+    "dev": {
+      "vrf_coordinator": "0xE7eD6747FaC5360f88a2EFC03E00d25789F69291",
+      "link_token": "0x602C71e4DAC47a042Ee7f46E0aee17F94A3bA0B6",
+      "keyhash": "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      "fee": 100000000000000000,
+      "verify": false
+    },
+    "ganache": {
+      "verify": false
+    },
+    "kovan": {
+      "verify": true,
+      "weth_token": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
+      "fau_token": "0xFab46E002BbF0b4509813474841E0716E6730136",
+      "dai_usd_price_feed": "0x777A68032a88E5A84678A77Af2CD65A7b3c0775a",
+      "eth_usd_price_feed": "0x9326BFA02ADD2366b30bacB125260Af641031331"
+    },
+    "rinkeby": {
+      "vrf_coordinator": "0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B",
+      "link_token": "0x01be23585060835e02b77ef475b0cc51aa1e0709",
+      "keyhash": "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      "fee": 100000000000000000,
+      "verify": true
+    }
+  },
+  "wallets": {
+    "from_key": "${PRIVATE_KEY}"
+  }
+}

@@ -14,14 +14,17 @@ function App() {
 
   const routes = [
     {
+      name: 'demo',
       path: 'demo',
       element: Demo,
     },
     {
+      name: 'devs',
       path: 'devs',
       element: Devs,
     },
     {
+      name: 'faq',
       path: 'faq',
       element: Faq,
     },
@@ -35,7 +38,7 @@ function App() {
             routes.map(x => {
               const Ele = x.element;
               return (
-                <Route path={x.path} element={<Ele />} />
+                <Route path={x.path} key={x.name} element={<Ele />} />
               )
             })
           }

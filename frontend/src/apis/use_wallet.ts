@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import helperConfig from "./helper-config.json";
+import etherConfig from "./ether-config.json";
+
 export const useWallet = () => {
   const { ethereum } = window
   const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);

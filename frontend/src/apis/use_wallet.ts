@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useContext  } from "react";
 
 import helperConfig from "./helper-config.json";
 import etherConfig from "./ether-config.json";
 
 const { ethereum } = window;
 
+const etherContext = createContext(null);
+
 export const useWallet = () => {
   const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);
   const [currentChain, SetCurrentChain] = useState<string | undefined>(undefined);
 
+  
+  console.log('render useWallet')
   useEffect(() => {
-    console.log('render useWallet')
     // @ts-ignore
     ethereum.on("accountsChanged", ([newAccount]) => {
       console.log("accountsChanged: ", newAccount);

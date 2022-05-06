@@ -24,6 +24,7 @@ def deplopy_all(enable_token_at_init=False, dice=100):
     )
     rating_contract = deplopy_contract(
         Rating, 
+        'dev',
         token_contract, 
         enable_token_at_init,
         dice,

@@ -29,8 +29,7 @@ contract RatingFactory {
             keyhash
         );
         ratingArray.push(rating);
-        // return new Rating(name, token, enableTokenAtInit, dice, vrfCoordinator, link, fee, keyhash);
-        return rating;
+        return new Rating(name, token, enableTokenAtInit, dice, vrfCoordinator, link, fee, keyhash);
        
     }
 }

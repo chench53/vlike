@@ -9,6 +9,7 @@ import "./VlikeToken.sol";
 contract Rating is VRFConsumerBase {
 
     uint256 public itemIdCounter = 1;
+    string public name;
     VlikeToken public token;
     bool public tokenEnabled;
     // lottery end
@@ -86,6 +87,7 @@ contract Rating is VRFConsumerBase {
     );
 
     constructor(
+        string memory name,
         VlikeToken _token,
         bool enableTokenAtInit,
         uint256 _dice,

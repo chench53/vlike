@@ -1,5 +1,4 @@
-// import Web3 from 'web3';
-import { AbiItem, asciiToHex } from "web3-utils";
+import { AbiItem } from "web3-utils";
 
 import helperConfig from "./helper-config.json";
 import etherConfig from "./ether-config.json";
@@ -11,7 +10,7 @@ const Web3 = require("web3");
 const BN = require('bn.js');
 
 const { ethereum } = window;
-ethereum.enable();
+// ethereum.enable();
 const rpcURL: string | undefined = process.env.REACT_APP_API_URL;
 const web3 = new Web3(
   new Web3.providers.HttpProvider(

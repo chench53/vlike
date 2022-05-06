@@ -1,23 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import helperConfig from "./helper-config.json";
 import etherConfig from "./ether-config.json";
 
+const { ethereum } = window;
+
 export const useWallet = () => {
-  const { ethereum } = window
   const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);
+  const [currentChain, SetCurrentChain] = useState<string | undefined>(undefined);
 
-  // @ts-ignore
-  ethereum.on("accountsChanged", ([newAccount]) => {
-    console.log("accountsChanged: ", newAccount);
-    setCurrentAccount(newAccount);
-  })
+  useEffect(() => {
+    console.log('render useWallet')
+    // @ts-ignore
+    ethereum.on("accountsChanged", ([newAccount]) => {
+      console.log("accountsChanged: ", newAccount);
+      setCurrentAccount(newAccount);
+    })
+    // @ts-ignore
+    ethereum.on('chainChanged', (chainId) => {
+      // Handle the new chain.
+      // Correctly handling chain changes can be complicated.
+      // We recommend reloading the page unless you have good reason not to.
+      window.location.reload();
+    });
 
-  return { currentAccount, setCurrentAccount };
+     ethereum.request({ method: 'net_version' }).then((chainId: string) => {
+      console.log(helperConfig[chainId]);
+      SetCurrentChain(helperConfig[chainId]);
+    });
+  }, [])
+
+  return { 
+    currentAccount, 
+    setCurrentAccount, 
+    currentChain, 
+    SetCurrentChain 
+  };
 }
 
 export const connectWallet = async (handlerSetAccout: (account: string)=>void) => {
-  const ethereum = window.ethereum;
   if (!ethereum) {
     console.log("No wallet plugin is available!");
     return;
@@ -30,4 +51,9 @@ export const connectWallet = async (handlerSetAccout: (account: string)=>void) =
   } catch (err) {
     console.log(err);
   }
+}
+
+export const getCurrentChain = async () => {
+  const chainId = ethereum.request({ method: 'eth_chainId' });
+  return helperConfig[chainId];
 }

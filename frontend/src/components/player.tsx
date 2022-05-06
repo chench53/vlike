@@ -1,11 +1,16 @@
 import { Box  } from '@mui/material';
 
+import { connectWallet, useWallet } from '../apis/use_wallet';
+
 interface PlayerProps { 
   embedUrl: string
 }
 
 export default function Player(props: PlayerProps) {
+
   const { embedUrl } = props;
+
+  const { currentAccount, currentChain } = useWallet();
   return (
     <Box sx={{display: 'flex', 'justify-content': 'center'}}>
       <iframe 

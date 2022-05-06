@@ -40,7 +40,7 @@ export default function Info(props: InfoProps) {
   const [hasRated, setHasRated] = useState(false);
   const [myRating, setMyRating] = useState<number | undefined>(undefined);
   const [ratingCount, setRatingCount] = useState([0, 0])
-  const { currentAccount, setCurrentAccount } = useWallet();
+  const { currentAccount, currentChain } = useWallet();
 
   const ratingOptions = [
     {
@@ -54,8 +54,10 @@ export default function Info(props: InfoProps) {
   ]
 
   useEffect(() => {
-    fetchCurrentRatingInfo()
-  }, [currentAccount])
+    if (currentChain === process.env.REACT_APP_CHAIN_NETWORK) {
+      fetchCurrentRatingInfo()
+    }
+  }, [currentAccount, currentChain])
 
   function fetchCurrentRatingInfo() {
     getRatingCount(itemId).then(data => {

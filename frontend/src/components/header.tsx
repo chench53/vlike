@@ -25,14 +25,14 @@ export default function Header(props: HeaderProps) {
 
   return (
     <Box>
-      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 4 }}>
+      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
         Vlike
         <Box sx={{ flex: 1 }} />
 
         {
           NavTabs.map(x => {
             return (
-              <Button key={x.name}>
+              <Button key={x.name} color="secondary">
                 <NavLink to={x.to} style={({isActive}) => ({
                   textDecoration: 'none',
                   color: isActive ? "gray" : ""

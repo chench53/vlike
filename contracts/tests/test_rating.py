@@ -121,4 +121,6 @@ def test_rating_factory():
     tx.wait(1)
     print(tx.return_value)
     assert tx.return_value
-    
+
+
+    print(rating_factory_contract.ratingArray(0))

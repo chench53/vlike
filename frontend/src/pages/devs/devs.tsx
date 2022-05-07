@@ -1,15 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import {
   Box,
-  Container,
   Button,
-  DialogTitle,
-  Dialog,
-  FormControl,
-  FormControlLabel,
-  Switch,
-  Checkbox,
   Table,
   TableBody,
   TableCell,
@@ -17,17 +10,12 @@ import {
   TableHead,
   TableRow,
   Toolbar,
-  TextField,
   Typography,
   Paper
 } from '@mui/material';
 
-import { createRating } from '../apis/ethereum';
-
-export interface SimpleDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
+import { ContractDialog } from './create_contract';
+import { getRatingContract } from "../../apis/ethereum";
 
 export default function Devs() {
 
@@ -61,7 +49,7 @@ export default function Devs() {
         <Button variant='contained' onClick={handleClickOpen}>New</Button>
       </Toolbar>
       <RatingsTable></RatingsTable>
-      <SimpleDialog
+      <ContractDialog
         open={open}
         onClose={handleClose}
       />
@@ -84,6 +72,24 @@ export function RatingsTable() {
     createData('0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85', 'test', false, 0),
     createData('0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9', 'test1', true, 0.2),
   ];
+
+  useEffect(() => {
+    console.log('useEffect');
+    try {
+      getRatingContract(0)
+    } catch(e) {
+      
+    }
+    // try {
+    //   getRatingContract(0).then(rating => {
+    //     console.log(rating);
+    //   }, error => {
+    //     console.error(error);
+    //   })
+    // } catch(e) {
+    //   console.error(e);
+    // }
+  }, [])
 
   return (
     <TableContainer component={Paper}>
@@ -111,7 +117,9 @@ export function RatingsTable() {
               <TableCell align="right">{row.balance}</TableCell>
               <TableCell align="right">
                 {
-                  row.tokenEnabled || <Button variant='contained' size='small'>Enable Token</Button>
+                  row.tokenEnabled ? undefined : (
+                    <Button variant='contained' size='small'>Enable Token</Button>
+                    )
                 }
               </TableCell>
             </TableRow>
@@ -120,83 +128,4 @@ export function RatingsTable() {
       </Table>
     </TableContainer>
   )
-}
-
-function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, open } = props;
-
-  const handleClose = () => {
-    onClose();
-  };
-
-  return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Create New Contract</DialogTitle>
-      <RatingForm handleSubmited={handleClose}></RatingForm>
-    </Dialog>
-  );
-}
-
-export interface RatingFormProps {
-  handleSubmited: () => void;
-}
-
-
-export function RatingForm(props: RatingFormProps) {
-
-  const { handleSubmited } = props;
-
-  interface modeType {
-    name: string;
-    enableTokenAtInit: boolean;
-  }
-
-  const [model, setModel] = useState<modeType>({
-    name: '',
-    enableTokenAtInit: false,
-  })
-
-  const [msg, setMsg] = useState('');
-
-  async function formSubmit() {
-    createRating(model.name, model.enableTokenAtInit).then(x => {
-      setMsg(`Transaction: ${x}`)
-      handleSubmited();
-    }, error => {
-      console.error(error);
-      handleSubmited();
-    })
-  }
-
-  return (
-    <Container maxWidth="sm" sx={{ marginBottom: 2}}>
-      <Box>
-        <FormControl sx={{ width: '40ch', gap: 2 }}>
-          <TextField label="Name" variant="standard" onChange={(e) => {
-            setModel(o => {
-              o.name = e.target.value; return o
-            })
-          }} />
-          <FormControlLabel
-            control={
-              <Checkbox name="enableTokenAtInit" 
-                onChange={(e) => {
-                  setModel(o => {
-                    o.enableTokenAtInit = e.target.checked; return o
-                  })
-                }}
-              />
-            }
-            label="enable tokens"
-          />
-        </FormControl>
-        <Box sx={{ marginTop: 4 }}>
-          <Button variant="contained" onClick={formSubmit}>Create Contract</Button>
-        </Box>
-        <Box>
-          {msg ? msg : ""}
-        </Box>
-      </Box>
-    </Container>
-  );
 }

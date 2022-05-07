@@ -7,7 +7,7 @@ import { useWallet } from './apis/use_wallet';
 import Header from './components/header';
 import Footer from './components/footer';
 import Demo from './pages/demo';
-import Devs from './pages/devs';
+import Devs from './pages/devs/devs';
 import Faq from './pages/faq';
 
 const theme = createTheme();

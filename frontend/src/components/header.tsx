@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box } from '@mui/material';
 import { connectWallet, useWallet } from '../apis/use_wallet';
 

@@ -7,7 +7,7 @@ import abi_rating_factory from './abi/rating_factory.json';
 import abi_vlike_token from './abi/vlike_token.json';
 
 const Web3 = require("web3");
-const BN = require('bn.js');
+// const BN = require('bn.js');
 
 const { ethereum } = window;
 // ethereum.enable();
@@ -30,7 +30,11 @@ export const getRatingCount = async (itemId: number) => {
 }
 
 export const getUserRating = async (itemId: number) => {
-  return await contractRating.methods.getUserRating(itemId).call({from: ethereum.selectedAddress})
+  return await contractRating.methods.getUserRating(itemId).call({from: ethereum.selectedAddress});
+}
+
+export const getRatingContract = async (index: Number) => {
+  return await contractRatingFactory.methods.ratingArray(index).call();
 }
 
 export const rate = async (itemId: number, rating: number) => {

@@ -1,7 +1,7 @@
-import { useEffect, useState, createContext, useContext  } from "react";
+import { useEffect, useState, createContext  } from "react";
 
 import helperConfig from "./helper-config.json";
-import etherConfig from "./ether-config.json";
+// import etherConfig from "./ether-config.json";
 
 const { ethereum } = window;
 

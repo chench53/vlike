@@ -145,5 +145,30 @@
       ],
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getBaseInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "tokenEnabled",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct Rating.BaseInfo",
+          "name": "baseInfo",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
 ]

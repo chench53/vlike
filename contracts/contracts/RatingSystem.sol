@@ -9,14 +9,20 @@ import "./VlikeToken.sol";
 contract Rating is VRFConsumerBase {
 
     uint256 public itemIdCounter = 1;
-    string public name;
     VlikeToken public token;
+    string public name;
     bool public tokenEnabled;
+
     // lottery end
     uint256 public dice;
     // chainlink
     uint256 public fee;
     bytes32 public keyhash;
+
+    struct BaseInfo {
+        string name;
+        bool tokenEnabled;
+    }
 
     struct StakeInfo {
         uint256 itemId;
@@ -107,6 +113,10 @@ contract Rating is VRFConsumerBase {
 
     function enableToken() public {
         tokenEnabled = true;
+    }
+
+    function getBaseInfo() external view returns (BaseInfo memory baseInfo) {
+        return BaseInfo(name, tokenEnabled);
     }
 
     // consider only owner visibility. Do users register items that they want to rate

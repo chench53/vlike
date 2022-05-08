@@ -12,7 +12,8 @@ import {
   TextField,
 } from '@mui/material';
 
-import { createRating } from '../../apis/ethereum';
+import { useWallet } from 'apis/use_wallet';
+import { createRating } from 'apis/ethereum';
 
 interface SimpleDialogProps {
   open: boolean;

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -13,11 +14,38 @@ import {
   Typography,
   Paper
 } from '@mui/material';
+import Refresh from '@mui/icons-material/Refresh';
 
+import { useWallet } from 'apis/use_wallet';
+import { getRatingContract, getRatingContractBaseInfo } from "apis/ethereum";
 import { ContractDialog } from './create_contract';
-import { getRatingContract } from "../../apis/ethereum";
+
+interface tableRow {
+  address: string,
+  name: string,
+  tokenEnabled: boolean,
+  balance: number,
+}
 
 export default function Devs() {
+
+  const { currentAccount } = useWallet();
+
+  // function createData(
+  //   address: string,
+  //   name: string,
+  //   tokenEnabled: boolean,
+  //   balance: number,
+  // ) {
+  //   return { address, name, tokenEnabled, balance };
+  // }
+
+  // var rows = [
+  //   createData('0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85', 'test', false, 0),
+  //   createData('0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9', 'test1', true, 0.2),
+  // ];
+
+  var rows: tableRow[] = [];
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
@@ -27,6 +55,26 @@ export default function Devs() {
   const handleClickOpen = () => {
     setOpen(true);
   };
+  const handleGetRatingContract = () => {
+    if (currentAccount) {
+      getRatingContract(0).then(ratingContract => {
+        console.log(ratingContract);
+        if (ratingContract) {
+          getRatingContractBaseInfo(ratingContract).then(baseInfo => {
+            rows = [
+              // tableRow(ratingContract, baseInfo.name, baseInfo.tokenEnabled, 0)
+              {
+                address: ratingContract,
+                name: baseInfo.name,
+                tokenEnabled: baseInfo.tokenEnabled,
+                balance: 0,
+              }
+            ]
+          }) 
+        }
+      })
+    }
+  }
 
   return (
     <Box sx={{
@@ -45,10 +93,13 @@ export default function Devs() {
           component="div"
         >
           My Contracts
+          <IconButton disabled={!currentAccount} onClick={handleGetRatingContract}>
+            <Refresh></Refresh>
+          </IconButton>
         </Typography>
-        <Button variant='contained' onClick={handleClickOpen}>New</Button>
+        <Button variant='contained' disabled={!currentAccount} onClick={handleClickOpen}>New</Button>
       </Toolbar>
-      <RatingsTable></RatingsTable>
+      <RatingsTable rows={rows}></RatingsTable>
       <ContractDialog
         open={open}
         onClose={handleClose}
@@ -57,39 +108,13 @@ export default function Devs() {
   )
 }
 
-export function RatingsTable() {
+interface RatingsTableProps {
+  rows: tableRow[]
+}
 
-  function createData(
-    address: string,
-    name: string,
-    tokenEnabled: boolean,
-    balance: number,
-  ) {
-    return { address, name, tokenEnabled, balance };
-  }
+export function RatingsTable(props: RatingsTableProps) {
 
-  const rows = [
-    createData('0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85', 'test', false, 0),
-    createData('0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9', 'test1', true, 0.2),
-  ];
-
-  useEffect(() => {
-    console.log('useEffect');
-    try {
-      getRatingContract(0)
-    } catch(e) {
-      
-    }
-    // try {
-    //   getRatingContract(0).then(rating => {
-    //     console.log(rating);
-    //   }, error => {
-    //     console.error(error);
-    //   })
-    // } catch(e) {
-    //   console.error(e);
-    // }
-  }, [])
+  const { rows } = props;
 
   return (
     <TableContainer component={Paper}>

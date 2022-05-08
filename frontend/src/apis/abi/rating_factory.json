@@ -2,6 +2,11 @@
     {
       "inputs": [
         {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
           "internalType": "contract VlikeToken",
           "name": "token",
           "type": "address"

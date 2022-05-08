@@ -5,7 +5,6 @@ run a test function:
     brownie test tests/test_rating.py -k test_rating_with_tokens -s
 """
 
-from unicodedata import name
 from brownie import (
     Rating,
     VlikeToken,
@@ -108,6 +107,7 @@ def test_rating_factory():
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
+    name = 'unittest'
     tx = rating_factory_contract.createRatingSystemContract(
         name,
         token_contract,
@@ -121,6 +121,4 @@ def test_rating_factory():
     tx.wait(1)
     print(tx.return_value)
     assert tx.return_value
-
-
-    print(rating_factory_contract.ratingArray(0))
+    assert rating_factory_contract.ratingArray(0)

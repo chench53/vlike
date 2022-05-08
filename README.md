@@ -33,32 +33,23 @@ Please check this [gitbook](https://chench53.gitbook.io/hackathon/) for more det
 
 To start developing locally, please:
 
-1. Use ganache-cli to start the local testnet on localhost:8545
+1. Open the Brownie console. It launches a ganache process local on localhost:8545. In /contracts, run
 
-    `ganache-cli.cmd --accounts 10 --hardfork istanbul --gasLimit 12000000 --mnemonic brownie --port 8545`
+    `brownie console`
 
-    ganache will generat 10 test accounts.
+2. Deployed contracts on local testnet. In the brownie console, run
 
-2. Deployed Rating contact on local testnet. In /contracts: 
+    `run('scripts/deploy')`
 
-    `brownie run .\scripts\deploy.py`
+  It would write a `.env.development.local` file in /frontend with the addresses of contracts.
 
-  get the Rating contract address on local testnet.
-
-3. Created .env file in /frontend:
-
-    ```
-    REACT_APP_API_URL=http://localhost:8545
-    REACT_APP_CONTRACT_RATING={the Rating contract address}
-    ```
-
-4. Run frontend in the development mode. In /frontend: 
+3. Run frontend in the development mode. In /frontend: 
 
     `npm start`
 
     Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-5. Connect wallet to local:8545, import a ganache generated test account with 100 ether.
+4. Connect wallet to local:8545, import a ganache generated test account with 100 ether.
 
 Then you can interact with local contracts in this local web page.
 
@@ -78,6 +69,7 @@ To deploy this project:
     ```
     REACT_APP_API_URL=REACT_APP_API_URL=/chain
     REACT_APP_CONTRACT_RATING={the Rating contract address}
+    ... 
     ```
 
     Since .env.local has higher priority than .env, the better practice is to assign a separate deployment server with different .env.local.
@@ -90,7 +82,7 @@ To deploy this project:
 
     ```
     location /chain {
-            proxy_pass https://rinkeby.infura.io/v3/bbf6b774ab29429d98322d03c268f5e8;
+        proxy_pass https://rinkeby.infura.io/v3/bbf6b774ab29429d98322d03c268f5e8;
     }
     ```
 
@@ -98,8 +90,9 @@ To deploy this project:
 
 The addresses of the contracts currently deployed on the testnet:
 
-- Rating [0x5ad56a6640A1fcDAc82FFC6ACA9dC9bCAd9B5bF7](https://rinkeby.etherscan.io/address/0x5ad56a6640A1fcDAc82FFC6ACA9dC9bCAd9B5bF7)
-- Token 
+- Rating [0x9f5518A4A5958Ac5a202e8Ca9488517250001753](https://rinkeby.etherscan.io/address/0x9f5518A4A5958Ac5a202e8Ca9488517250001753)
+- Token 0xCAadB6ED550E18800AC309A8c1Fb1362877a4Bf5
+- RatingFactory 0x825B3e6948ca38a3905c0691567FFbC0cb865017
 
 The web page deployed 
 

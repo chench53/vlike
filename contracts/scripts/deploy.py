@@ -48,6 +48,20 @@ def _setup(rating_contract, string):
     }
 
 
+def _write_frontend_end(token_contract, rating_contract, rating_factory_contract):
+    path = '../frontend/.env.development.local'
+    env_file_content = '''
+REACT_APP_API_URL=http://localhost:8545
+REACT_APP_CHAIN_NETWORK=dev
+REACT_APP_CONTRACT_RATING={}
+REACT_APP_CONTRACT_RATING_FACTORY={}
+REACT_APP_CONTRACT_VLIKE_TOKEN={}
+    '''.format(rating_contract.address, rating_factory_contract.address, token_contract.address)
+    with open(path, 'w') as f:
+        f.write(env_file_content)
+    print(f'wrote to {path}')
+
 def main():
     token_contract, rating_contract, rating_factory_contract = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
+    _write_frontend_end(token_contract, rating_contract, rating_factory_contract)

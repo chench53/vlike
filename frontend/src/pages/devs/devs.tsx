@@ -29,25 +29,10 @@ interface tableRow {
 
 export default function Devs() {
 
-  const { currentAccount } = useWallet();
-
-  // function createData(
-  //   address: string,
-  //   name: string,
-  //   tokenEnabled: boolean,
-  //   balance: number,
-  // ) {
-  //   return { address, name, tokenEnabled, balance };
-  // }
-
-  // var rows = [
-  //   createData('0x6951b5Bd815043E3F842c1b026b0Fa888Cc2DD85', 'test', false, 0),
-  //   createData('0xe0aA552A10d7EC8760Fc6c246D391E698a82dDf9', 'test1', true, 0.2),
-  // ];
-
-  var rows: tableRow[] = [];
-
+  const { currentAccount } = useWallet();  
+  const [ rows, setRows ] = useState<tableRow[]>([])
   const [open, setOpen] = useState(false);
+
   const handleClose = () => {
     setOpen(false);
     // setSelectedValue(value);
@@ -55,24 +40,34 @@ export default function Devs() {
   const handleClickOpen = () => {
     setOpen(true);
   };
-  const handleGetRatingContract = () => {
+  const handleGetRatingContract = async () => {
     if (currentAccount) {
-      getRatingContract(0).then(ratingContract => {
-        console.log(ratingContract);
-        if (ratingContract) {
-          getRatingContractBaseInfo(ratingContract).then(baseInfo => {
-            rows = [
-              // tableRow(ratingContract, baseInfo.name, baseInfo.tokenEnabled, 0)
-              {
-                address: ratingContract,
-                name: baseInfo.name,
-                tokenEnabled: baseInfo.tokenEnabled,
-                balance: 0,
-              }
-            ]
-          }) 
+      var r: tableRow[] = []
+      for(let i=0; i<5; i++) {
+        const row = await getRow(i);
+        console.log(row);
+        if (row) {
+          r.push(row);
+        } else {
+          break;
         }
-      })
+      }
+      console.log(r);
+      setRows(r);
+    }
+  }
+
+  const getRow = async (i: number) => {
+    const ratingContract = await getRatingContract(i);
+    if (ratingContract) {
+      const baseInfo = await getRatingContractBaseInfo(ratingContract);
+      let row = {
+        address: ratingContract,
+        name: baseInfo.name,
+        tokenEnabled: baseInfo.tokenEnabled,
+        balance: 0,
+      } as tableRow
+      return row;
     }
   }
 
@@ -122,10 +117,10 @@ export function RatingsTable(props: RatingsTableProps) {
         <TableHead>
           <TableRow>
             <TableCell>Address</TableCell>
-            <TableCell align="right">Name</TableCell>
-            <TableCell align="right">Token enabled</TableCell>
-            <TableCell align="right">Balance</TableCell>
-            <TableCell align="right">Actions</TableCell>
+            <TableCell >Name</TableCell>
+            <TableCell >Token enabled</TableCell>
+            <TableCell >Balance</TableCell>
+            <TableCell >Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -137,10 +132,10 @@ export function RatingsTable(props: RatingsTableProps) {
               <TableCell component="th" scope="row">
                 {row.address}
               </TableCell>
-              <TableCell align="right">{row.name}</TableCell>
-              <TableCell align="right">{row.tokenEnabled.toString()}</TableCell>
+              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.tokenEnabled.toString()}</TableCell>
               <TableCell align="right">{row.balance}</TableCell>
-              <TableCell align="right">
+              <TableCell >
                 {
                   row.tokenEnabled ? undefined : (
                     <Button variant='contained' size='small'>Enable Token</Button>

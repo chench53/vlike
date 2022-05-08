@@ -93,7 +93,7 @@ contract Rating is VRFConsumerBase {
     );
 
     constructor(
-        string memory name,
+        string memory _name,
         VlikeToken _token,
         bool enableTokenAtInit,
         uint256 _dice,
@@ -102,6 +102,7 @@ contract Rating is VRFConsumerBase {
         uint256 _fee,
         bytes32 _keyhash
     ) VRFConsumerBase(_vrfCoordinator, _link) {
+        name = _name;
         dice = _dice;
         token = _token;
         fee = _fee;

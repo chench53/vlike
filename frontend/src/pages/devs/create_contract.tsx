@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   Box,
@@ -12,7 +12,6 @@ import {
   TextField,
 } from '@mui/material';
 
-import { useWallet } from 'apis/use_wallet';
 import { createRating } from 'apis/ethereum';
 
 interface SimpleDialogProps {
@@ -42,18 +41,28 @@ interface RatingFormProps {
 export function RatingForm(props: RatingFormProps) {
 
   const { handleSubmited } = props;
-
+  
   interface modeType {
     name: string;
     enableTokenAtInit: boolean;
   }
-
+  
+  const [ valid, setValid ] = useState(false);
   const [model, setModel] = useState<modeType>({
     name: '',
     enableTokenAtInit: false,
   })
 
   const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    console.log('model.name')
+    if (model.name) {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [model.name])
 
   async function formSubmit() {
     createRating(model.name, model.enableTokenAtInit).then(x => {
@@ -70,9 +79,8 @@ export function RatingForm(props: RatingFormProps) {
       <Box>
         <FormControl sx={{ width: '40ch', gap: 2 }}>
           <TextField label="Name" variant="standard" onChange={(e) => {
-            setModel(o => {
-              o.name = e.target.value; return o
-            })
+            setModel(Object.assign(model, {name: e.target.value}))
+            setValid(true);
           }} />
           <FormControlLabel
             control={
@@ -88,7 +96,7 @@ export function RatingForm(props: RatingFormProps) {
           />
         </FormControl>
         <Box sx={{ marginTop: 4 }}>
-          <Button variant="contained" onClick={formSubmit}>Create Contract</Button>
+          <Button variant="contained" disabled={!valid} onClick={formSubmit}>Create Contract</Button>
         </Box>
         <Box>
           {msg ? msg : ""}

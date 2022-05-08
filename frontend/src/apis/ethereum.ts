@@ -49,12 +49,16 @@ export const getUserRating = async (itemId: number) => {
 }
 
 export const getRatingContract = async (index: number) => {
-  return await contractRatingFactory.methods.ratingArray(index).call();
+  try{
+    return await contractRatingFactory.methods.ratingArray(index).call();
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 export const getRatingContractBaseInfo = async (address: string) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], address);
-  const _baseInfo = await MyContractRating.methods.getBaseInfo();
+  const _baseInfo = await MyContractRating.methods.getBaseInfo().call();
   return {
     name: _baseInfo[0],
     tokenEnabled: _baseInfo[1]
@@ -74,10 +78,7 @@ export const rate = async (itemId: number, rating: number) => {
 }
 
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
-  console.log('createRating ????')
-  console.log(name)
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();
-
   const txParams = {
     to: contractRatingFactoryAddress,
     from: ethereum.selectedAddress,
@@ -92,11 +93,9 @@ export const createRating = async (name: string, enableTokenAtInit: boolean) => 
       keyhash
       ).encodeABI()
   }
-  console.log('tx0')
   const tx = await ethereum.request({
     method: 'eth_sendTransaction',
     params: [txParams]
   })
-  console.log(tx)
   return tx;
 }

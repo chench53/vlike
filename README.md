@@ -33,7 +33,7 @@ Please check this [gitbook](https://chench53.gitbook.io/hackathon/) for more det
 
 To start developing locally, please:
 
-1. Open the Brownie console. It launches a ganache process local on localhost:8545. In /contracts, run
+1. Open the Brownie console. It launches a ganache process locally on localhost:8545. In /contracts, run
 
     `brownie console`
 
@@ -41,7 +41,7 @@ To start developing locally, please:
 
     `run('scripts/deploy')`
 
-  It would write a `.env.development.local` file in /frontend with the addresses of contracts.
+     It would write a `.env.development.local` file in /frontend with the addresses of contracts.
 
 3. Run frontend in the development mode. In /frontend: 
 

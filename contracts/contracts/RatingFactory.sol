@@ -6,8 +6,13 @@ import "./RatingSystem.sol";
 import "./VlikeToken.sol";
 
 contract RatingFactory {
-    Rating[] public ratingArray;
+
     mapping(address => address[]) public UserAddressToContractAddress;
+
+    event createRatingEvent(
+        address user,
+        address ratingContract
+    );
 
     function createRatingSystemContract(
         string memory name,
@@ -19,7 +24,7 @@ contract RatingFactory {
         uint256 fee,
         bytes32 keyhash
     ) public returns(Rating tokenAddress){
-        Rating rating = new Rating(
+        Rating ratingContract = new Rating(
             name,
             token,
             enableTokenAtInit,
@@ -29,18 +34,20 @@ contract RatingFactory {
             fee,
             keyhash
         );
-        ratingArray.push(rating);
-        return new Rating(name, token, enableTokenAtInit, dice, vrfCoordinator, link, fee, keyhash);
-    }
-    function getContractCount(address) public view returns(uint256) {
-        // needs to return the specific users contract count, I am unsure on the syntax.
-        return(uint);
-    }
+        UserAddressToContractAddress[msg.sender].push(address(ratingContract));
 
+        emit createRatingEvent(msg.sender, address(ratingContract));
 
-    function getContract(address, uint256) public view returns (address) {
-        // needs to return the contract address(es) that a specific user has created.
-        return UserAddressToContractAddress;
+        return ratingContract;
     }
-    
+    // return the specific users contract count.
+    function getContractCount(address user) public view returns(uint256 count) {
+        return UserAddressToContractAddress[user].length;
+    }
+    // return the contract address(es) that a specific user has created.
+    function getContract(address user, uint256 index) public view returns (address) {
+        uint256 length = getContractCount(user);
+        require(index < getContractCount(user), 'index out of array length');
+        return UserAddressToContractAddress[user][index];
+    }   
 }

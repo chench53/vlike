@@ -3,6 +3,7 @@ run tests:
     brownie test tests/test_rating.py -s
 run a test function:
     brownie test tests/test_rating.py -k test_rating_with_tokens -s
+    brownie test tests/test_rating.py -k test_rating_factory -s
 """
 
 from brownie import (
@@ -100,6 +101,11 @@ def test_rating_with_tokens():
 def test_rating_factory():
     if network.show_active() not in LOCAL_BLOCKCHAIN:
         pytest.skip()
+
+    account = get_account() # owner of contracts
+    user1 = get_account(1)
+    user2 = get_account(2)
+
     token_contract = deplopy_contract(
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
@@ -117,8 +123,14 @@ def test_rating_factory():
         get_contract("link_token").address,
         config["networks"][network.show_active()]["fee"],
         config["networks"][network.show_active()]["keyhash"],
+        {'from': user1}
     )
     tx.wait(1)
     print(tx.return_value)
     assert tx.return_value
-    assert rating_factory_contract.ratingArray(0)
+
+    assert rating_factory_contract.getContractCount(user1) == 1
+    assert rating_factory_contract.getContract(user1, 0) == tx.return_value
+
+    with pytest.raises(exceptions.VirtualMachineError, match = 'index') as e: 
+        rating_factory_contract.getContract(user1, 1)

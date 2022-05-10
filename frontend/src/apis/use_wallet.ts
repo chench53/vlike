@@ -37,6 +37,7 @@ export const useWallet = () => {
     });
 
      ethereum.request({ method: 'net_version' }).then((chainId: string) => {
+       console.log(chainId)
       console.log(helperConfig[chainId]);
       SetCurrentChain(helperConfig[chainId]);
     });

@@ -33,6 +33,15 @@ def reg():
     itemId = tx.return_value
     print(itemId)
 
+def flash_abi():
+    mypath = 'build/contracts/RatingFactory.json'
+    with open(mypath, 'r') as f:
+        build = json.load(f)
+        abi = build['abi']
+    path = '../frontend/src/apis/abi/rating_factory.json'
+    with open(path, 'w') as f:
+        json.dump(abi, f)
 
 def main():
-    reg()
+    # reg()
+    flash_abi()

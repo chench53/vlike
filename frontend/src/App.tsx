@@ -7,6 +7,7 @@ import Header from './components/header';
 import Footer from './components/footer';
 import Demo from './pages/demo';
 import Devs from './pages/devs/devs';
+import Dashboard from "pages/dashboard/dashboard";
 import Faq from './pages/faq';
 import './App.css';
 
@@ -27,6 +28,11 @@ const routes = [
     name: 'faq',
     path: 'faq',
     element: Faq,
+  },
+  {
+    name: 'dashboard',
+    path: 'dashboard/:address',
+    element: Dashboard,
   },
 ]
 

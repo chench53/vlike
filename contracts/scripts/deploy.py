@@ -43,24 +43,42 @@ def _setup(rating_contract, string):
     tx = fund_with_link(rating_contract.address)
     tx = rating_contract.registerItem(string, {"from": account})
     tx.wait(1)
-    return {
-        'item_id': tx.return_value
-    }
+    if network.show_active() in LOCAL_BLOCKCHAIN:
+        return {
+            'item_id': tx.return_value
+        }
 
 
 def _write_frontend_end(token_contract, rating_contract, rating_factory_contract):
+    env_file_content_fmt = '''
+REACT_APP_API_URL={}
+REACT_APP_CHAIN_NETWORK={}
+REACT_APP_CONTRACT_RATING={}
+REACT_APP_CONTRACT_RATING_FACTORY={}
+REACT_APP_CONTRACT_VLIKE_TOKEN={}
+    '''
     if network.show_active() in LOCAL_BLOCKCHAIN:
         path = '../frontend/.env.development.local'
-        env_file_content = '''
-    REACT_APP_API_URL=http://localhost:8545
-    REACT_APP_CHAIN_NETWORK=dev
-    REACT_APP_CONTRACT_RATING={}
-    REACT_APP_CONTRACT_RATING_FACTORY={}
-    REACT_APP_CONTRACT_VLIKE_TOKEN={}
-        '''.format(rating_contract.address, rating_factory_contract.address, token_contract.address)
-        with open(path, 'w') as f:
-            f.write(env_file_content)
-        print(f'wrote to {path}')
+        env_file_content = env_file_content_fmt.format(
+            'http://localhost:8545',
+            'dev',
+            rating_contract.address, 
+            rating_factory_contract.address, 
+            token_contract.address
+            )
+    else:
+        path = '../frontend/.env.production.local'
+        env_file_content = env_file_content_fmt.format(
+            '/chain',
+            'rinkeby',
+            rating_contract.address, 
+            rating_factory_contract.address, 
+            token_contract.address
+            )
+    
+    with open(path, 'w') as f:
+        f.write(env_file_content)
+    print(f'wrote to {path} in {network.show_active()}')
 
 def main():
     token_contract, rating_contract, rating_factory_contract = deplopy_all()

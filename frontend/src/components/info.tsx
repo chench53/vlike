@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Box, IconButton } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
-import { useWallet } from '../apis/use_wallet';
-import { getRatingCount, getUserRating, rate } from '../apis/ethereum';
+import { etherContext } from 'apis/use_wallet';
+import { getRatingCount, getUserRating, rate } from 'apis/ethereum';
 
 const { ethereum } = window;
 
@@ -40,7 +40,7 @@ export default function Info(props: InfoProps) {
   const [hasRated, setHasRated] = useState(false);
   const [myRating, setMyRating] = useState<number | undefined>(undefined);
   const [ratingCount, setRatingCount] = useState([0, 0])
-  const { currentAccount, currentChain } = useWallet();
+  const { currentAccount, currentChain } = useContext(etherContext);
 
   const ratingOptions = [
     {
@@ -54,9 +54,7 @@ export default function Info(props: InfoProps) {
   ]
 
   useEffect(() => {
-    if (currentChain === process.env.REACT_APP_CHAIN_NETWORK) {
-      fetchCurrentRatingInfo()
-    }
+    fetchCurrentRatingInfo()
   }, [currentAccount, currentChain])
 
   function fetchCurrentRatingInfo() {

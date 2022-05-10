@@ -48,12 +48,16 @@ export const getUserRating = async (itemId: number) => {
   return await contractRating.methods.getUserRating(itemId).call({from: ethereum.selectedAddress});
 }
 
-export const getRatingContract = async (index: number) => {
-  try{
-    return await contractRatingFactory.methods.ratingArray(index).call();
-  } catch(e) {
-    console.error(e);
-  }
+export const getRatingContractCount = async (user: string) => {
+  return await contractRatingFactory.methods.getContractCount(user).call();
+}
+
+export const getRatingContract = async (user: string, index: number) => {
+  // try{
+    return await contractRatingFactory.methods.getContract(user, index).call();
+  // } catch(e) {
+  //   console.error(e);
+  // }
 }
 
 export const getRatingContractBaseInfo = async (address: string) => {
@@ -66,19 +70,22 @@ export const getRatingContractBaseInfo = async (address: string) => {
 }
 
 export const rate = async (itemId: number, rating: number) => {
-  const txParams = {
-    to: contractRatingAddress,
-    from: ethereum.selectedAddress,
-    data: contractRating.methods.rate(itemId, !!rating).encodeABI()
-  }
-  return await ethereum.request({
-    method: 'eth_sendTransaction',
-    params: [txParams]
-  })
+  // const txParams = {
+  //   to: contractRatingAddress,
+  //   from: ethereum.selectedAddress,
+  //   data: contractRating.methods.rate(itemId, !!rating).encodeABI()
+  // }
+  // return await ethereum.request({
+  //   method: 'eth_sendTransaction',
+  //   params: [txParams]
+  // })
+
+  return await contractRating.methods.rate(itemId, !!rating).send({from: ethereum.selectedAddress})
 }
 
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();
+  console.log(ethereum.selectedAddress)
   const txParams = {
     to: contractRatingFactoryAddress,
     from: ethereum.selectedAddress,
@@ -98,4 +105,17 @@ export const createRating = async (name: string, enableTokenAtInit: boolean) => 
     params: [txParams]
   })
   return tx;
+  // await contractRatingFactory.methods.createRatingSystemContract(
+  //     name,
+  //     contractVlikeTokenAddress,
+  //     enableTokenAtInit, 
+  //     100, 
+  //     vrfCoordinator, 
+  //     linkToken,
+  //     1000000, // bignumber issue
+  //     keyhash
+  // ).send({from: ethereum.selectedAddress, gas: 50000000})
+  // .on("confirmation", (confirmationNumber: number, receipt: object) => {
+  //   console.log(receipt)
+  // })
 }

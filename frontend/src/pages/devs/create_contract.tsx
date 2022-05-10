@@ -16,26 +16,30 @@ import { createRating } from 'apis/ethereum';
 
 interface DialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (tx: string|null) => void;
 }
 
 export function ContractDialog(props: DialogProps) {
   const { onClose, open } = props;
 
   const handleClose = () => {
-    onClose();
+    onClose(null);
+  };
+
+  const handleSubmited = (tx: string|null) => {
+    onClose(tx);
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Create New Contract</DialogTitle>
-      <RatingForm handleSubmited={handleClose}></RatingForm>
+      <RatingForm handleSubmited={handleSubmited}></RatingForm>
     </Dialog>
   );
 }
 
 interface RatingFormProps {
-  handleSubmited: () => void;
+  handleSubmited: (tx: string|null) => void;
 }
 
 export function RatingForm(props: RatingFormProps) {
@@ -53,8 +57,6 @@ export function RatingForm(props: RatingFormProps) {
     enableTokenAtInit: false,
   })
 
-  const [msg, setMsg] = useState('');
-
   useEffect(() => {
     console.log('model.name')
     if (model.name) {
@@ -66,11 +68,10 @@ export function RatingForm(props: RatingFormProps) {
 
   async function formSubmit() {
     createRating(model.name, model.enableTokenAtInit).then(x => {
-      setMsg(`Transaction: ${x}`)
-      handleSubmited();
+      handleSubmited(x);
     }, error => {
       console.error(error);
-      handleSubmited();
+      handleSubmited(null);
     })
   }
 
@@ -97,9 +98,6 @@ export function RatingForm(props: RatingFormProps) {
         </FormControl>
         <Box sx={{ marginTop: 4 }}>
           <Button variant="contained" disabled={!valid} onClick={formSubmit}>Create Contract</Button>
-        </Box>
-        <Box>
-          {msg ? msg : ""}
         </Box>
       </Box>
     </Container>

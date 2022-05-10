@@ -1,12 +1,13 @@
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box } from '@mui/material';
-import { connectWallet, useWallet } from '../apis/use_wallet';
+import { connectWallet, etherContext } from '../apis/use_wallet';
 
 interface HeaderProps { }
 
 export default function Header(props: HeaderProps) {
-  const { } = props;
-  const { currentAccount, setCurrentAccount } = useWallet();
+
+  const { currentAccount, setCurrentAccount} = useContext(etherContext);
 
   const NavTabs = [
     {
@@ -22,7 +23,6 @@ export default function Header(props: HeaderProps) {
       to: '/faq',
     }, 
   ]
-
   return (
     <Box>
       <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
@@ -42,7 +42,7 @@ export default function Header(props: HeaderProps) {
           })
         }
 
-        {currentAccount ? (
+        {(currentAccount && setCurrentAccount) ? (
           <Button variant='outlined'>
             {`${currentAccount.slice(0, 5)}...${currentAccount.slice(38)}`}
           </Button>

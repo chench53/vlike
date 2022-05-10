@@ -3,23 +3,23 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Checkbox,
   Container,
   Dialog,
   DialogTitle,
   FormControl,
   FormControlLabel,
-  Checkbox,
   TextField,
 } from '@mui/material';
 
 import { createRating } from 'apis/ethereum';
 
-interface SimpleDialogProps {
+interface DialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function ContractDialog(props: SimpleDialogProps) {
+export function ContractDialog(props: DialogProps) {
   const { onClose, open } = props;
 
   const handleClose = () => {

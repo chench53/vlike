@@ -5,13 +5,22 @@ import helperConfig from "./helper-config.json";
 
 const { ethereum } = window;
 
-const etherContext = createContext(null);
+export interface ethConnectionType {
+  currentAccount: string | undefined;
+  setCurrentAccount?: (arg0: string) => void;
+  currentChain: string | undefined;
+  SetCurrentChain?: (arg0: string) => void;
+}
+
+export const etherContext = createContext<ethConnectionType>({
+  currentAccount: undefined,
+  currentChain: undefined,
+});
 
 export const useWallet = () => {
   const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);
   const [currentChain, SetCurrentChain] = useState<string | undefined>(undefined);
 
-  
   console.log('render useWallet')
   useEffect(() => {
     // @ts-ignore
@@ -38,10 +47,10 @@ export const useWallet = () => {
     setCurrentAccount, 
     currentChain, 
     SetCurrentChain 
-  };
+  } as ethConnectionType;
 }
 
-export const connectWallet = async (handlerSetAccout: (account: string)=>void) => {
+export const connectWallet = async (handlerSetAccout: ((account: string)=>void) | undefined) => {
   if (!ethereum) {
     console.log("No wallet plugin is available!");
     return;
@@ -50,7 +59,9 @@ export const connectWallet = async (handlerSetAccout: (account: string)=>void) =
   try {
     const [account] = await ethereum.request({ method: 'eth_requestAccounts' });
     console.log(`account connect: ${account}`)
-    handlerSetAccout(account);
+    if (handlerSetAccout) {
+      handlerSetAccout(account);
+    }
   } catch (err) {
     console.log(err);
   }

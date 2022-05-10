@@ -49,5 +49,5 @@ contract RatingFactory {
         uint256 length = getContractCount(user);
         require(index < getContractCount(user), 'index out of array length');
         return UserAddressToContractAddress[user][index];
-    }   
+    }
 }

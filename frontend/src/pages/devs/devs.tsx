@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import {
   Box,
@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import Refresh from '@mui/icons-material/Refresh';
 
-import { useWallet } from 'apis/use_wallet';
+import { etherContext } from 'apis/use_wallet';
 import { getRatingContract, getRatingContractBaseInfo } from "apis/ethereum";
 import { ContractDialog } from './create_contract';
 
@@ -29,7 +29,7 @@ interface tableRow {
 
 export default function Devs() {
 
-  const { currentAccount } = useWallet();  
+  const { currentAccount } = useContext(etherContext);
   const [ rows, setRows ] = useState<tableRow[]>([])
   const [open, setOpen] = useState(false);
 

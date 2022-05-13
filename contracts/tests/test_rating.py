@@ -77,7 +77,7 @@ def test_rating_with_tokens():
     user1 = get_account(1)
     user2 = get_account(2)
 
-    token_contract, rating_contract, _, _pools_contract = deplopy_all(True)
+    token_contract, rating_contract, _, pools_contract = deplopy_all(True)
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
@@ -98,8 +98,8 @@ def test_rating_with_tokens():
     )
 
     # breakpoint()
-    stake_info = rating_contract.itemPoolMapping(1, rating, 0)
-    assert stake_info[3: 5] == [1, 1] # voteWeight, votes
+    stake_info = pools_contract.itemPoolMapping(1, rating, 0)
+    assert stake_info[4: 6] == [1, 1] # voteWeight, votes
     assert 'rewardEvent' not in tx.events
 
     # user2
@@ -114,8 +114,9 @@ def test_rating_with_tokens():
         request_id, STATIC_RNG, rating_contract.address, {"from": account}
     )
     assert tx_vrf.events["rewardEvent"]['rewardAmount'] == stake_amount + stake_amount2
+    # breakpoint()
     with pytest.raises(exceptions.VirtualMachineError): # pool is reset
-        rating_contract.itemPoolMapping(1, rating, 0)
+        pools_contract.itemPoolMapping(1, rating, 0)
 
 
 def test_rating_factory():

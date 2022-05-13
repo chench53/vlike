@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./RatingSystem.sol";
 import "./VlikeToken.sol";
+import "./Pools.sol";
 
 contract RatingFactory {
 
@@ -16,7 +17,8 @@ contract RatingFactory {
 
     function createRatingSystemContract(
         string memory name,
-        VlikeToken token,
+        // VlikeToken token,
+        Pools _pools,
         bool enableTokenAtInit,
         uint256 dice,
         address vrfCoordinator,
@@ -26,7 +28,8 @@ contract RatingFactory {
     ) public returns(Rating tokenAddress){
         Rating ratingContract = new Rating(
             name,
-            token,
+            // token,
+            _pools,
             enableTokenAtInit,
             dice,
             vrfCoordinator,

@@ -8,8 +8,9 @@ run a test function:
 
 from brownie import (
     Rating,
-    VlikeToken,
     RatingFactory,
+    VlikeToken,
+    Pools,
     exceptions,
     network,
     config,
@@ -29,7 +30,26 @@ def test_rating():
     user1 = get_account(1)
     user2 = get_account(2)
 
-    rating_contract = deplopy_contract(Rating, constants.ADDRESS_ZERO, False)
+    token_contract = deplopy_contract(
+        VlikeToken, 
+        Web3.toWei(INITIAL_SUPPLY, 'ether'),
+    )
+    pools_contract = deplopy_contract(
+        Pools,
+        token_contract
+    )
+    name = 'unittest'
+    rating_contract = deplopy_contract(
+        Rating,
+        name,
+        constants.ADDRESS_ZERO,
+        False,
+        100,
+        constants.ADDRESS_ZERO,
+        constants.ADDRESS_ZERO,
+        config["networks"][network.show_active()]["fee"],
+        config["networks"][network.show_active()]["keyhash"],
+    )
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     # rating info on (hasVoted, rating)
@@ -57,7 +77,7 @@ def test_rating_with_tokens():
     user1 = get_account(1)
     user2 = get_account(2)
 
-    token_contract, rating_contract, _ = deplopy_all(True)
+    token_contract, rating_contract, _, _pools_contract = deplopy_all(True)
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
@@ -110,13 +130,17 @@ def test_rating_factory():
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
     )
+    pools_contract = deplopy_contract(
+        Pools,
+        token_contract
+    )
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
     name = 'unittest'
     tx = rating_factory_contract.createRatingSystemContract(
         name,
-        token_contract,
+        pools_contract,
         False,
         100,
         get_contract("vrf_coordinator").address,

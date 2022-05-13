@@ -5,10 +5,12 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 import "./VlikeToken.sol";
+import "./Pools.sol";
 
 contract Rating is VRFConsumerBase {
 
     uint256 public itemIdCounter = 1;
+    Pools public pools;
     VlikeToken public token;
     string public name;
     bool public tokenEnabled;
@@ -94,7 +96,8 @@ contract Rating is VRFConsumerBase {
 
     constructor(
         string memory _name,
-        VlikeToken _token,
+        // VlikeToken _token,
+        Pools _pools,
         bool enableTokenAtInit,
         uint256 _dice,
         address _vrfCoordinator, 
@@ -104,7 +107,7 @@ contract Rating is VRFConsumerBase {
     ) VRFConsumerBase(_vrfCoordinator, _link) {
         name = _name;
         dice = _dice;
-        token = _token;
+        pools = _pools;
         fee = _fee;
         keyhash = _keyhash;
         if (enableTokenAtInit == true) {
@@ -114,6 +117,7 @@ contract Rating is VRFConsumerBase {
 
     function enableToken() public {
         tokenEnabled = true;
+        token = pools.token();
     }
 
     function getBaseInfo() external view returns (BaseInfo memory baseInfo) {
@@ -163,6 +167,8 @@ contract Rating is VRFConsumerBase {
     function stake(uint256 _itemId, bool _score) internal {
         (uint256 stakeAmount, uint256 voteWeight) = calculateRatingStake(_itemId);
         token.transferFrom(msg.sender, address(this), stakeAmount);
+        // token.transferFrom(msg.sender, address(pools), stakeAmount);
+
         StakeInfo memory stakeInfo = StakeInfo(_itemId, msg.sender, stakeAmount, voteWeight, 0);
         itemPoolMapping[_itemId][_score].push(stakeInfo);
         bytes32 requestId = requestRandomness(keyhash, fee);

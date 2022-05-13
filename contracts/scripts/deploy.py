@@ -1,6 +1,7 @@
 from brownie import (
     Rating,
     RatingFactory,
+    Pools,
     VlikeToken,
     config,
     network
@@ -22,10 +23,15 @@ def deplopy_all(enable_token_at_init=False, dice=100):
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
     )
+    pools_contract = deplopy_contract(
+        Pools,
+        token_contract
+    )
     rating_contract = deplopy_contract(
         Rating, 
         'dev',
-        token_contract, 
+        # token_contract, 
+        pools_contract,
         enable_token_at_init,
         dice,
         get_contract("vrf_coordinator").address,
@@ -36,7 +42,7 @@ def deplopy_all(enable_token_at_init=False, dice=100):
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
-    return token_contract, rating_contract, rating_factory_contract
+    return token_contract, rating_contract, rating_factory_contract, pools_contract
 
 def _setup(rating_contract, string):
     account = get_account()
@@ -81,6 +87,6 @@ REACT_APP_CONTRACT_VLIKE_TOKEN={}
     print(f'wrote to {path} in {network.show_active()}')
 
 def main():
-    token_contract, rating_contract, rating_factory_contract = deplopy_all()
+    token_contract, rating_contract, rating_factory_contract, _ = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
     _write_frontend_end(token_contract, rating_contract, rating_factory_contract)

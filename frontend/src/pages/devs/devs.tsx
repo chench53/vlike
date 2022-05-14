@@ -31,13 +31,13 @@ interface tableRow {
 
 export default function Devs() {
 
-  const { currentAccount, currentChain } = useContext(etherContext);
+  const { currentAccount, currentChain, onRightChain } = useContext(etherContext);
   const [ rows, setRows ] = useState<tableRow[]>([])
   const [ open, setOpen ] = useState(false);
   const [ dataFetched, setDataFetched ] = useState(true);
 
   useEffect(() => {
-    if (currentAccount) {
+    if (currentAccount && onRightChain) {
       handleGetRatingContract();
     }
   }, [currentAccount, currentChain])
@@ -118,7 +118,7 @@ export function RatingsTable(props: RatingsTableProps) {
   const { dataFetched, rows } = props;
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Box}>
       { dataFetched || <LinearProgress sx={{ width: '100%'}}/>}
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>

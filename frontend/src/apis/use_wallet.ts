@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext  } from "react";
+import { useEffect, useState, createContext, useContext  } from "react";
 
 import helperConfig from "./helper-config.json";
 // import etherConfig from "./ether-config.json";
@@ -10,16 +10,19 @@ export interface ethConnectionType {
   setCurrentAccount?: (arg0: string) => void;
   currentChain: string | undefined;
   SetCurrentChain?: (arg0: string) => void;
+  onRightChain: boolean | undefined;
 }
 
 export const etherContext = createContext<ethConnectionType>({
   currentAccount: undefined,
   currentChain: undefined,
+  onRightChain: undefined,
 });
 
 export const useWallet = () => {
   const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);
   const [currentChain, SetCurrentChain] = useState<string | undefined>(undefined);
+  const [onRightChain, SetOnRightChain] = useState<boolean | undefined>(undefined);
 
   console.log('render useWallet')
   useEffect(() => {
@@ -37,9 +40,15 @@ export const useWallet = () => {
     });
 
      ethereum.request({ method: 'net_version' }).then((chainId: string) => {
-       console.log(chainId)
-      console.log(helperConfig[chainId]);
+      console.log(`connect chainId: ${chainId}, chainName: ${helperConfig[chainId]}`)
       SetCurrentChain(helperConfig[chainId]);
+      if (helperConfig[chainId]) {
+        SetOnRightChain(helperConfig[chainId] === process.env.REACT_APP_CHAIN_NETWORK)
+      } else if (chainId) {
+        SetOnRightChain(false);
+      } else {
+        SetOnRightChain(undefined);
+      }
     });
   }, [])
 
@@ -47,7 +56,8 @@ export const useWallet = () => {
     currentAccount, 
     setCurrentAccount, 
     currentChain, 
-    SetCurrentChain 
+    SetCurrentChain,
+    onRightChain
   } as ethConnectionType;
 }
 

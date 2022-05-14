@@ -47,3 +47,14 @@
     transform: rotate(360deg);
   }
 }
+
+/* dark mode */
+
+a {
+  color: #FFF;
+}
+a:hover {
+   color: rgb(108, 108, 116)
+}
+
+

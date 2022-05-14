@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { Toolbar, Button, Box } from '@mui/material';
 import { connectWallet, etherContext } from '../apis/use_wallet';
 
@@ -25,17 +25,21 @@ export default function Header(props: HeaderProps) {
   ]
   return (
     <Box>
-      <Toolbar sx={{ borderBottom: 1, borderColor: 'divider'}}>
+      <Toolbar sx={{ 
+        borderBottom: 1, 
+        borderColor: 'divider',
+        }}>
         Vlike
         <Box sx={{ flex: 1 }} />
 
         {
           NavTabs.map(x => {
             return (
-              <Button key={x.name} color="secondary">
+              <Button key={x.name}>
                 <NavLink to={x.to} style={({isActive}) => ({
                   textDecoration: 'none',
-                  color: isActive ? "gray" : ""
+                  // color: isActive ? "gray" : ""
+                  // color: 'white'
                 })}>{x.name}</NavLink>
               </Button>
             )

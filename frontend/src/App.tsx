@@ -1,5 +1,6 @@
+import { useContext } from 'react';
 import { Routes, Route } from "react-router-dom";
-import { Box, Alert } from '@mui/material';
+import { Box, Container, Alert } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useWallet, etherContext } from './apis/use_wallet';
@@ -11,7 +12,11 @@ import Dashboard from "pages/dashboard/dashboard";
 import Faq from './pages/faq';
 import './App.css';
 
-const theme = createTheme();
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 const routes = [
   {
@@ -31,7 +36,7 @@ const routes = [
   },
   {
     name: 'dashboard',
-    path: 'dashboard/:address',
+    path: 'dashboard/:contractAddress',
     element: Dashboard,
   },
 ]
@@ -42,6 +47,7 @@ function App() {
     setCurrentAccount,
     currentChain,
     SetCurrentChain,
+    onRightChain
   } = useWallet();
 
 
@@ -52,32 +58,48 @@ function App() {
         setCurrentAccount,
         currentChain,
         SetCurrentChain,
+        onRightChain,
       }}>
-
-        <Header />
-        {
-          (currentAccount && currentChain && (currentChain !== process.env.REACT_APP_CHAIN_NETWORK)) ?
-            <Alert severity="error">
-              plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
-            </Alert>
-            :
-            <Box sx={{ marginTop: 4 }}>
-              <Routes>
-                {
-                  routes.map(x => {
-                    const Ele = x.element;
-                    return (
-                      <Route path={x.path} key={x.name} element={<Ele />} />
-                    )
-                  })
-                }
-              </Routes>
-            </Box>
-        }
-        <Footer />
+        <Box sx={{
+          bgcolor: 'background.default', 
+          color: 'text.primary',
+          minHeight: '100vh',
+          }}>
+          <Header />
+          <Main />
+          <Footer />
+        </Box>
       </etherContext.Provider>
     </ThemeProvider>
   );
 }
 
 export default App;
+
+function Main() {
+
+  const { onRightChain } = useContext(etherContext);
+
+  if (onRightChain === false) {
+    return (
+      <Alert severity="error">
+      plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
+    </Alert>
+    )
+  } else {
+    return (
+      <Box sx={{ marginTop: 1 }}>
+        <Routes>
+          {
+            routes.map(x => {
+              const Ele = x.element;
+              return (
+                <Route path={x.path} key={x.name} element={<Ele />} />
+              )
+            })
+          }
+        </Routes>
+      </Box>
+    )
+  }
+}

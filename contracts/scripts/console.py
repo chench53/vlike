@@ -1,7 +1,6 @@
 """
     this script is for debug purpose only
 """
-
 import json
 
 from brownie import (

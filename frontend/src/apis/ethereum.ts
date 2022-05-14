@@ -5,6 +5,7 @@ import etherConfig from "./ether-config.json";
 import abi_rating from './abi/rating.json';
 import abi_rating_factory from './abi/rating_factory.json';
 import abi_vlike_token from './abi/vlike_token.json';
+import abi_pools from './abi/pools.json';
 
 const Web3 = require("web3");
 // const BN = require('bn.js');
@@ -24,6 +25,8 @@ const contractRatingFactoryAddress = process.env.REACT_APP_CONTRACT_RATING_FACTO
 const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiItem[], contractRatingFactoryAddress);
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
 const contractVlikeToke = new web3.eth.Contract(abi_vlike_token as AbiItem[], contractVlikeTokenAddress);
+const contractPoolsAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
+const contractPools = new web3.eth.Contract(abi_pools as AbiItem[], contractPoolsAddress);
 
 export const getEtherConfig = async () => {
   const chainId: string = await web3.eth.getChainId();
@@ -38,6 +41,10 @@ export const getEtherConfig = async () => {
     linkToken,
     keyhash
   }
+}
+
+export const setTag = async (name: string) => {
+  return await contractVlikeToke.methods.setTag(name).send({from: ethereum.selectedAddress});
 }
 
 export const getRatingCount = async (itemId: number) => {
@@ -86,36 +93,39 @@ export const rate = async (itemId: number, rating: number) => {
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();
   console.log(ethereum.selectedAddress)
-  const txParams = {
-    to: contractRatingFactoryAddress,
-    from: ethereum.selectedAddress,
-    data: contractRatingFactory.methods.createRatingSystemContract(
-      name,
-      contractVlikeTokenAddress,
-      enableTokenAtInit, 
-      100, 
-      vrfCoordinator, 
-      linkToken,
-      1000000, // bignumber issue
-      keyhash
-      ).encodeABI()
-  }
-  const tx = await ethereum.request({
-    method: 'eth_sendTransaction',
-    params: [txParams]
-  })
-  return tx;
-  // await contractRatingFactory.methods.createRatingSystemContract(
+  // const txParams = {
+  //   to: contractRatingFactoryAddress,
+  //   from: ethereum.selectedAddress,
+  //   data: contractRatingFactory.methods.createRatingSystemContract(
   //     name,
-  //     contractVlikeTokenAddress,
+  //     contractPoolsAddress,
   //     enableTokenAtInit, 
   //     100, 
   //     vrfCoordinator, 
   //     linkToken,
   //     1000000, // bignumber issue
   //     keyhash
-  // ).send({from: ethereum.selectedAddress, gas: 50000000})
+  //     ).encodeABI()
+  // }
+  // const tx = await ethereum.request({
+  //   method: 'eth_sendTransaction',
+  //   params: [txParams]
+  // })
+  // return tx;
+  return await contractRatingFactory.methods.createRatingSystemContract(
+      name,
+      contractPoolsAddress,
+      enableTokenAtInit, 
+      100, 
+      vrfCoordinator, 
+      linkToken,
+      1000000, // bignumber issue
+      keyhash
+  ).send({from: ethereum.selectedAddress})
   // .on("confirmation", (confirmationNumber: number, receipt: object) => {
   //   console.log(receipt)
   // })
+
+  // return await setTag(name);
 }
+

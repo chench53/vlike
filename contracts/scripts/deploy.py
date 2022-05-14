@@ -1,3 +1,6 @@
+import json
+import re
+
 from brownie import (
     Rating,
     RatingFactory,
@@ -55,13 +58,14 @@ def _setup(rating_contract, string):
         }
 
 
-def _write_frontend_end(token_contract, rating_contract, rating_factory_contract):
+def _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract, pools_contract):
     env_file_content_fmt = '''
 REACT_APP_API_URL={}
 REACT_APP_CHAIN_NETWORK={}
 REACT_APP_CONTRACT_RATING={}
 REACT_APP_CONTRACT_RATING_FACTORY={}
 REACT_APP_CONTRACT_VLIKE_TOKEN={}
+REACT_APP_CONTRACT_POOLS={}
     '''
     if network.show_active() in LOCAL_BLOCKCHAIN:
         path = '../frontend/.env.development.local'
@@ -70,7 +74,8 @@ REACT_APP_CONTRACT_VLIKE_TOKEN={}
             'dev',
             rating_contract.address, 
             rating_factory_contract.address, 
-            token_contract.address
+            token_contract.address,
+            pools_contract.address,
             )
     else:
         path = '../frontend/.env.production.local'
@@ -79,14 +84,39 @@ REACT_APP_CONTRACT_VLIKE_TOKEN={}
             'rinkeby',
             rating_contract.address, 
             rating_factory_contract.address, 
-            token_contract.address
+            token_contract.address,
+            pools_contract.address,
             )
     
     with open(path, 'w') as f:
         f.write(env_file_content)
-    print(f'wrote to {path} in {network.show_active()}')
+    print(f'wrote to {path} in {network.show_active()} done')
+
+def _write_frontend_end_abi():
+    contact_names = [
+        'RatingFactory',
+        'Rating',
+        'VlikeToken',
+        'Pools'
+    ]
+    for name in contact_names:
+        mypath = f'build/contracts/{name}.json'
+        with open(mypath, 'r') as f:
+            build = json.load(f)
+            abi = build['abi']
+        path = f'../frontend/src/apis/abi/{__sub_name(name)}.json'
+        with open(path, 'w') as f:
+            json.dump(abi, f)
+    print(f'wrote abi done')
+
+def __sub_name(name):
+    """
+    RatingFactory ->rating_factory
+    """
+    return re.sub('([a-z])?([A-Z])', lambda x: (x.group(1) and (x.group(1).lower() + '_') or '') + x.group(2).lower(), name)
 
 def main():
-    token_contract, rating_contract, rating_factory_contract, _ = deplopy_all()
+    token_contract, rating_contract, rating_factory_contract, pools_contract = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
-    _write_frontend_end(token_contract, rating_contract, rating_factory_contract)
+    _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract, pools_contract)
+    _write_frontend_end_abi()

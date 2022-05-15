@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./VlikeToken.sol";
 
 contract Pools {
 
     VlikeToken public token;
+    address public owner;
 
     struct StakeInfo {
         uint256 itemId;
@@ -34,6 +36,7 @@ contract Pools {
         VlikeToken _token
     ) {
         token = _token;
+        owner = msg.sender;
     }
 
     function stake(uint256 _itemId, bool _score, StakeInfo memory stakeInfo) external {
@@ -41,7 +44,6 @@ contract Pools {
     }
 
     function vote(StakeInfo memory stakeInfo, uint256 _randomness) external {
-        // bool rating = userRating[stakeInfo.rater][stakeInfo.itemId].rating;
         bool rating = stakeInfo.rating;
         uint256 selectedIndex = _randomness % itemPoolMapping[stakeInfo.itemId][rating].length;
         itemPoolMapping[stakeInfo.itemId][rating][selectedIndex].votes += stakeInfo.voteWeight;
@@ -64,6 +66,7 @@ contract Pools {
         uint256 cursor = _randomness % totalVotes; 
         address winner = _findWinner(_itemid, cursor);
         token.transfer(winner, rewardAmount);
+        resetPool(_itemid);
 
         emit rewardEvent(_itemid, winner, rewardAmount);
 
@@ -86,8 +89,13 @@ contract Pools {
         }
     }
 
-    function resetPool(uint256 _itemid) external {
+    function resetPool(uint256 _itemid) internal {
         delete itemPoolMapping[_itemid][false];
         delete itemPoolMapping[_itemid][true];
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "you are not owner");
+        _;
     }
 }

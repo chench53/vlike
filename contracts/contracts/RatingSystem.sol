@@ -10,7 +10,7 @@ import "./Pools.sol";
 
 contract Rating is VRFConsumerBase {
 
-    uint256 public itemIdCounter = 1;
+    uint256 public itemIdCounter;
     Pools public pools;
     VlikeToken public token;
     string public name;
@@ -54,8 +54,10 @@ contract Rating is VRFConsumerBase {
     // has voted. 
     mapping(address => mapping(uint256 => RatingByUser)) public userRating;
 
-    // mapping from url to item Id
-    mapping(string => uint256) url_IDMapping;
+    event registerEvent(
+        uint256 itemId,
+        string value
+    );
 
     event rateEvent(
         uint256 itemId,
@@ -102,7 +104,6 @@ contract Rating is VRFConsumerBase {
     // consider only owner visibility. Do users register items that they want to rate
     // or do we provide the items? We only want an item to be registered once. 
     function registerItem(string memory _urlData) public returns(uint256) {
-        require(url_IDMapping[_urlData] == 0, 'This item is already registered');
         Item memory item = Item(
             itemIdCounter, 
             _urlData, 
@@ -111,9 +112,11 @@ contract Rating is VRFConsumerBase {
             0
         );
         itemMapping[itemIdCounter] = item;
-        url_IDMapping[_urlData] = itemIdCounter;
+
+        emit registerEvent(itemIdCounter, _urlData);
+
         itemIdCounter += 1;
-        return url_IDMapping[_urlData];
+        return itemIdCounter;
     }
 
     function rate(uint256 _itemId, bool _score) public returns(bool success){
@@ -187,7 +190,7 @@ contract Rating is VRFConsumerBase {
         if (checkDice(_randomness)) {
             uint256 itemId = stakeInfo.itemId;
             pools.reward(itemId, _randomness);
-            pools.resetPool(itemId);
+            // pools.resetPool(itemId);
         }
     }
 

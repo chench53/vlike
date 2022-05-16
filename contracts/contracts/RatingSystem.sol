@@ -73,8 +73,8 @@ contract Rating is VRFConsumerBase {
 
     constructor(
         string memory _name,
-        // VlikeToken _token,
-        Pools _pools,
+        VlikeToken _token,
+        // Pools _pools,
         bool enableTokenAtInit,
         uint256 _dice,
         address _vrfCoordinator, 
@@ -84,7 +84,8 @@ contract Rating is VRFConsumerBase {
     ) VRFConsumerBase(_vrfCoordinator, _link) {
         name = _name;
         dice = _dice;
-        pools = _pools;
+        token = _token;
+        // pools = _pools;
         fee = _fee;
         keyhash = _keyhash;
         if (enableTokenAtInit == true) {
@@ -93,8 +94,8 @@ contract Rating is VRFConsumerBase {
     }
 
     function enableToken() public {
+        pools = new Pools(token);
         tokenEnabled = true;
-        token = pools.token();
     }
 
     function getBaseInfo() external view returns (BaseInfo memory baseInfo) {

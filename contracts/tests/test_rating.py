@@ -11,6 +11,7 @@ from brownie import (
     RatingFactory,
     VlikeToken,
     Pools,
+    Contract,
     exceptions,
     network,
     config,
@@ -77,7 +78,9 @@ def test_rating_with_tokens():
     user1 = get_account(1)
     user2 = get_account(2)
 
-    token_contract, rating_contract, _, pools_contract = deplopy_all(True)
+    token_contract, rating_contract, _ = deplopy_all(True)
+    pools_contract_address = rating_contract.pools()
+    pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
     itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
 
     stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
@@ -131,17 +134,13 @@ def test_rating_factory():
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
     )
-    pools_contract = deplopy_contract(
-        Pools,
-        token_contract
-    )
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
     name = 'unittest'
     tx = rating_factory_contract.createRatingSystemContract(
         name,
-        pools_contract,
+        token_contract,
         False,
         100,
         get_contract("vrf_coordinator").address,

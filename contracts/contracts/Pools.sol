@@ -39,11 +39,11 @@ contract Pools {
         owner = msg.sender;
     }
 
-    function stake(uint256 _itemId, bool _score, StakeInfo memory stakeInfo) external {
+    function stake(uint256 _itemId, bool _score, StakeInfo memory stakeInfo) external onlyOwner {
         itemPoolMapping[_itemId][_score].push(stakeInfo);
     }
 
-    function vote(StakeInfo memory stakeInfo, uint256 _randomness) external {
+    function vote(StakeInfo memory stakeInfo, uint256 _randomness) external onlyOwner {
         bool rating = stakeInfo.rating;
         uint256 selectedIndex = _randomness % itemPoolMapping[stakeInfo.itemId][rating].length;
         itemPoolMapping[stakeInfo.itemId][rating][selectedIndex].votes += stakeInfo.voteWeight;
@@ -51,7 +51,7 @@ contract Pools {
         emit voteEvent(stakeInfo.itemId, stakeInfo.rater, selectedIndex);
     }
 
-    function reward(uint256 _itemid, uint256 _randomness) external returns (address, uint256, uint256) {
+    function reward(uint256 _itemid, uint256 _randomness) external onlyOwner returns (address, uint256, uint256) {
         uint256 rewardAmount;
         uint256 totalVotes;
         for (uint256 i=0; i < itemPoolMapping[_itemid][false].length; i++) {
@@ -95,7 +95,7 @@ contract Pools {
     }
 
     modifier onlyOwner {
-        require(msg.sender == owner, "you are not owner");
+        require(msg.sender == owner, "you are not owner of pools");
         _;
     }
 }

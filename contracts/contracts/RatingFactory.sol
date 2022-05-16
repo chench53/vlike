@@ -17,8 +17,8 @@ contract RatingFactory {
 
     function createRatingSystemContract(
         string memory name,
-        // VlikeToken token,
-        Pools _pools,
+        VlikeToken token,
+        // Pools _pools,
         bool enableTokenAtInit,
         uint256 dice,
         address vrfCoordinator,
@@ -28,8 +28,8 @@ contract RatingFactory {
     ) public returns(Rating tokenAddress){
         Rating ratingContract = new Rating(
             name,
-            // token,
-            _pools,
+            token,
+            // _pools,
             enableTokenAtInit,
             dice,
             vrfCoordinator,

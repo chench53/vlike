@@ -26,15 +26,15 @@ def deplopy_all(enable_token_at_init=False, dice=100):
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
     )
-    pools_contract = deplopy_contract(
-        Pools,
-        token_contract
-    )
+    # pools_contract = deplopy_contract(
+    #     Pools,
+    #     token_contract
+    # )
     rating_contract = deplopy_contract(
         Rating, 
         'dev',
-        # token_contract, 
-        pools_contract,
+        token_contract, 
+        # pools_contract,
         enable_token_at_init,
         dice,
         get_contract("vrf_coordinator").address,
@@ -45,7 +45,12 @@ def deplopy_all(enable_token_at_init=False, dice=100):
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
-    return token_contract, rating_contract, rating_factory_contract, pools_contract
+    return token_contract, rating_contract, rating_factory_contract
+    # return {
+    #     'token_contract': token_contract,
+    #     'rating_contract': rating_contract,
+    #     'rating_factory_contract': rating_factory_contract,
+    # }
 
 def _setup(rating_contract, string):
     account = get_account()
@@ -58,14 +63,14 @@ def _setup(rating_contract, string):
         }
 
 
-def _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract, pools_contract):
+def _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract):
     env_file_content_fmt = '''
 REACT_APP_API_URL={}
 REACT_APP_CHAIN_NETWORK={}
 REACT_APP_CONTRACT_RATING={}
 REACT_APP_CONTRACT_RATING_FACTORY={}
 REACT_APP_CONTRACT_VLIKE_TOKEN={}
-REACT_APP_CONTRACT_POOLS={}
+
     '''
     if network.show_active() in LOCAL_BLOCKCHAIN:
         path = '../frontend/.env.development.local'
@@ -75,7 +80,7 @@ REACT_APP_CONTRACT_POOLS={}
             rating_contract.address, 
             rating_factory_contract.address, 
             token_contract.address,
-            pools_contract.address,
+            # pools_contract.address,
             )
     else:
         path = '../frontend/.env.production.local'
@@ -85,26 +90,17 @@ REACT_APP_CONTRACT_POOLS={}
             rating_contract.address, 
             rating_factory_contract.address, 
             token_contract.address,
-            pools_contract.address,
+            # pools_contract.address,
             )
     
     with open(path, 'w') as f:
         f.write(env_file_content)
     print(f'wrote to {path} in {network.show_active()} done')
 
-def _write_frontend_end_abi():
-    contact_names = [
-        'RatingFactory',
-        'Rating',
-        'VlikeToken',
-        'Pools'
-    ]
-    for name in contact_names:
-        mypath = f'build/contracts/{name}.json'
-        with open(mypath, 'r') as f:
-            build = json.load(f)
-            abi = build['abi']
-        path = f'../frontend/src/apis/abi/{__sub_name(name)}.json'
+def _write_frontend_end_abi(*contracts):
+    for contract in contracts:
+        abi = contract.abi
+        path = f'../frontend/src/apis/abi/{__sub_name(contract._name)}.json'
         with open(path, 'w') as f:
             json.dump(abi, f)
     print(f'wrote abi done')
@@ -116,7 +112,7 @@ def __sub_name(name):
     return re.sub('([a-z])?([A-Z])', lambda x: (x.group(1) and (x.group(1).lower() + '_') or '') + x.group(2).lower(), name)
 
 def main():
-    token_contract, rating_contract, rating_factory_contract, pools_contract = deplopy_all()
+    token_contract, rating_contract, rating_factory_contract = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
-    _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract, pools_contract)
-    _write_frontend_end_abi()
+    _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract)
+    _write_frontend_end_abi(token_contract, rating_contract, rating_factory_contract)

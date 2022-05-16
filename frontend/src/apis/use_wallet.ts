@@ -40,10 +40,14 @@ export const useWallet = () => {
     });
 
      ethereum.request({ method: 'net_version' }).then((chainId: string) => {
-      console.log(`connect chainId: ${chainId}, chainName: ${helperConfig[chainId]}`)
-      SetCurrentChain(helperConfig[chainId]);
-      if (helperConfig[chainId]) {
-        SetOnRightChain(helperConfig[chainId] === process.env.REACT_APP_CHAIN_NETWORK)
+      var chainName = helperConfig[chainId]
+      if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
+        chainName = 'dev'
+      }
+      console.log(`connect chainId: ${chainId}, chainName: ${chainName}`)
+      SetCurrentChain(chainName);
+      if (chainName) {
+        SetOnRightChain(chainName === process.env.REACT_APP_CHAIN_NETWORK)
       } else if (chainId) {
         SetOnRightChain(false);
       } else {

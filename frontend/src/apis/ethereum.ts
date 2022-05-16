@@ -26,8 +26,8 @@ const contractRatingFactoryAddress = process.env.REACT_APP_CONTRACT_RATING_FACTO
 const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiItem[], contractRatingFactoryAddress);
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
 const contractVlikeToke = new web3.eth.Contract(abi_vlike_token as AbiItem[], contractVlikeTokenAddress);
-const contractPoolsAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
-const contractPools = new web3.eth.Contract(abi_pools as AbiItem[], contractPoolsAddress);
+// const contractPoolsAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
+// const contractPools = new web3.eth.Contract(abi_pools as AbiItem[], contractPoolsAddress);
 
 export const getEtherConfig = async () => {
   const chainId: string = await web3.eth.getChainId();
@@ -95,7 +95,7 @@ export const createRating = async (name: string, enableTokenAtInit: boolean) => 
   // console.log(ethereum.selectedAddress)
   return await contractRatingFactory.methods.createRatingSystemContract(
       name,
-      contractPoolsAddress,
+      contractVlikeTokenAddress,
       enableTokenAtInit, 
       100, 
       vrfCoordinator, 

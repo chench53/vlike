@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
@@ -20,7 +20,6 @@ interface RatingOptionProps {
 function RatingOption(props: RatingOptionProps) {
   const { hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon } = props;
   const Icon = icon;
-  // console.log(`${myRating}  ${ratingOptionValue}`)
   return (
     <Box>
       <IconButton disabled={hasRated || !ethereum.selectedAddress} onClick={() => giveRating(ratingOptionValue)}>
@@ -63,7 +62,7 @@ export default function Info(props: InfoProps) {
     })
     getUserRating(itemId).then(data => {
       setHasRated(data[0]);
-      console.log(data)
+      // console.log(data)
       if (data[0] === true) {
         setMyRating(+data[1]);
         console.log('setMyRating')
@@ -79,25 +78,33 @@ export default function Info(props: InfoProps) {
 
   return (
     <Box sx={{
+      width: '100%',
       display: 'flex',
-      'justify-content': 'end',
-      gap: 2
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingLeft: 2,
+      paddingRight: 2,
     }}>
-      {
-        ratingOptions.map(x => {
-          return (
-            <RatingOption
-              key={x.value}
-              hasRated={hasRated} 
-              myRating={myRating} 
-              giveRating={giveRating} 
-              ratingOptionValue={x.value} 
-              ratingCount={ratingCount[x.value]}
-              icon={x.icon}
-            ></RatingOption>
-          )
-        })
-      }
+      <Typography variant='subtitle1'>
+      id: {itemId}
+      </Typography>
+      <Box sx={{display: 'flex', gap: 2}}>
+        {
+          ratingOptions.map(x => {
+            return (
+              <RatingOption
+                key={x.value}
+                hasRated={hasRated} 
+                myRating={myRating} 
+                giveRating={giveRating} 
+                ratingOptionValue={x.value} 
+                ratingCount={ratingCount[x.value]}
+                icon={x.icon}
+              ></RatingOption>
+            )
+          })
+        }
+      </Box>
     </Box>
   );
 }

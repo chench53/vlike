@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box } from '@mui/material';
 import { connectWallet, etherContext } from '../apis/use_wallet';
 
@@ -11,8 +11,8 @@ export default function Header(props: HeaderProps) {
 
   const NavTabs = [
     {
-      name: 'demo',
-      to: '/demo',
+      name: 'example',
+      to: '/example',
     }, 
     {
       name: 'devs',

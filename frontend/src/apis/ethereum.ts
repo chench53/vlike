@@ -108,7 +108,7 @@ export const getItemsCount = async (ratingContractAddress: string) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
   return await MyContractRating.methods.itemIdCounter().call();
 }
-export const getItemRating = async (ratingContractAddress: string, itemId: number) => {
+export const getItem = async (ratingContractAddress: string, itemId: number) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
   return await MyContractRating.methods.itemMapping(itemId).call({from: ethereum.selectedAddress});
 }

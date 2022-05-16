@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { Routes, Route } from "react-router-dom";
-import { Box, Container, Alert } from '@mui/material';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Box, Alert } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useWallet, etherContext } from './apis/use_wallet';
@@ -20,9 +20,9 @@ const theme = createTheme({
 
 const routes = [
   {
-    name: 'demo',
-    path: 'demo',
-    element: Demo,
+    name: 'example',
+    path: 'example',
+    element: Demo
   },
   {
     name: 'devs',
@@ -50,7 +50,6 @@ function App() {
     onRightChain
   } = useWallet();
 
-
   return (
     <ThemeProvider theme={theme}>
       <etherContext.Provider value={{
@@ -61,10 +60,10 @@ function App() {
         onRightChain,
       }}>
         <Box sx={{
-          bgcolor: 'background.default', 
+          bgcolor: 'background.default',
           color: 'text.primary',
           minHeight: '100vh',
-          }}>
+        }}>
           <Header />
           <Main />
           <Footer />
@@ -83,8 +82,8 @@ function Main() {
   if (onRightChain === false) {
     return (
       <Alert severity="error">
-      plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
-    </Alert>
+        plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
+      </Alert>
     )
   } else {
     return (
@@ -98,6 +97,7 @@ function Main() {
               )
             })
           }
+          <Route path='*' key='home' element={<Navigate to="/example" replace />} />
         </Routes>
       </Box>
     )

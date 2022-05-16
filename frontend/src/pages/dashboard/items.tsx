@@ -17,7 +17,7 @@ import {
 import Refresh from '@mui/icons-material/Refresh';
 
 import { ItemDialog } from './item_dlg';
-import { getItemsCount, getItemRating } from 'apis/ethereum';
+import { getItemsCount, getItem } from 'apis/ethereum';
 import { ratingContractContext } from 'apis/hooks';
 
 interface tableRow {
@@ -55,7 +55,7 @@ export default function Items(props: ItemsProps) {
   }
 
   const getRow = async (contractAddress: string, i: number) => {
-    const item = await getItemRating(contractAddress, i);
+    const item = await getItem(contractAddress, i);
     console.log(item)
     let row = {
       id: item.itemID,

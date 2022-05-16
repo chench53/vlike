@@ -20,7 +20,8 @@ import pytest
 from web3 import constants, Web3
 
 from scripts.tools import get_account, get_contract, LOCAL_BLOCKCHAIN, INITIAL_SUPPLY
-from scripts.deploy import deplopy_contract, deplopy_all, _setup
+from scripts.deploy import deplopy_contract, deplopy_all
+from scripts.setup import add_items
 
 _USERS = {}
 
@@ -61,7 +62,7 @@ class TestRating():
             config["networks"][network.show_active()]["fee"],
             config["networks"][network.show_active()]["keyhash"],
         )
-        itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
+        itemId = add_items(rating_contract, "abc", "xyz")['item_id']
 
         # rating info on (hasVoted, rating)
         ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})
@@ -91,7 +92,7 @@ class TestRating():
         token_contract, _, rating_contract = deplopy_all(True)
         pools_contract_address = rating_contract.pools()
         pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
-        itemId = _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")['item_id']
+        itemId = add_items(rating_contract, "abc")['item_id']
 
         stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
         token_contract.approve(rating_contract, stake_amount, {'from': user1})

@@ -1,24 +1,27 @@
-import { Grid, Container } from '@mui/material';
+import { 
+  Box, 
+  Container,
+  Grid, 
+  Divider, 
+  Typography 
+} from '@mui/material';
 
-import Player from '../components/player';
-import Info from '../components/info';
+import Content from 'components/content';
 
 export default function Demo() {
 
-  const item = {
-    embedUrl: 'https://www.youtube.com/embed/lRba55HTK0Q',
-    itemId: 0
-  }
-
   return (
-    <Container maxWidth="sm">
-      <Grid container spacing={2} justifyContent="center" direction="column">
-        <Grid item >
-          <Player embedUrl={item.embedUrl}/>
-        </Grid>
-        <Grid item >
-          <Info itemId={item.itemId}/>
-        </Grid>
+    <Container sx={{
+      marginTop: 2
+    }}>
+      <Typography variant="h6">
+        Address: {process.env.REACT_APP_CONTRACT_RATING}, Token not enabled.
+      </Typography>
+      <Grid container justifyContent="center" alignItems="center" gap={8} sx={{
+        marginTop: 4
+      }}>
+        <Content id={0} />
+        <Content id={1} />
       </Grid>
     </Container>
   );

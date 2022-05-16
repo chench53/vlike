@@ -17,7 +17,7 @@ contract Pools {
         uint256 voteWeight;
         uint256 votes;
     }
-
+    // itemid => rating => StakeInfo
     mapping(uint256 => mapping(bool => StakeInfo[])) public itemPoolMapping;
 
     event voteEvent(

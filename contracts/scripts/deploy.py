@@ -6,6 +6,7 @@ from brownie import (
     RatingFactory,
     Pools,
     VlikeToken,
+    Contract,
     config,
     network
 )
@@ -22,16 +23,15 @@ def deplopy_contract(contact_container, *args):
     return contract
 
 def deplopy_all(enable_token_at_init=False, dice=100):
+    account = get_account()
     token_contract = deplopy_contract(
         VlikeToken, 
         Web3.toWei(INITIAL_SUPPLY, 'ether'),
     )
-    # pools_contract = deplopy_contract(
-    #     Pools,
-    #     token_contract
-    # )
-    rating_contract = deplopy_contract(
-        Rating, 
+    rating_factory_contract = deplopy_contract(
+        RatingFactory
+    )
+    rating_factory_contract.createRatingSystemContract(
         'dev',
         token_contract, 
         # pools_contract,
@@ -41,16 +41,15 @@ def deplopy_all(enable_token_at_init=False, dice=100):
         get_contract("link_token").address,
         config["networks"][network.show_active()]["fee"],
         config["networks"][network.show_active()]["keyhash"],
-    )
-    rating_factory_contract = deplopy_contract(
-        RatingFactory
-    )
-    return token_contract, rating_contract, rating_factory_contract
-    # return {
-    #     'token_contract': token_contract,
-    #     'rating_contract': rating_contract,
-    #     'rating_factory_contract': rating_factory_contract,
-    # }
+        {'from': account}
+    ).wait(1)
+    rating_contract = _get_rating(rating_factory_contract, account)
+    return token_contract, rating_factory_contract, rating_contract
+
+def _get_rating(rating_factory_contract, user):
+    rating_contract_address = rating_factory_contract.UserAddressToContractAddress(user, 0)
+    rating_contract = Contract.from_abi('rating', rating_contract_address, Rating.abi)
+    return rating_contract
 
 def _setup(rating_contract, string):
     account = get_account()
@@ -112,7 +111,7 @@ def __sub_name(name):
     return re.sub('([a-z])?([A-Z])', lambda x: (x.group(1) and (x.group(1).lower() + '_') or '') + x.group(2).lower(), name)
 
 def main():
-    token_contract, rating_contract, rating_factory_contract = deplopy_all()
+    token_contract, rating_factory_contract, rating_contract = deplopy_all()
     _setup(rating_contract, "https://www.youtube.com/embed/lRba55HTK0Q")
     _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract)
     _write_frontend_end_abi(token_contract, rating_contract, rating_factory_contract)

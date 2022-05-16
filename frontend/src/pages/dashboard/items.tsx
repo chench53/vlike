@@ -15,7 +15,10 @@ import {
   Paper
 } from '@mui/material';
 import Refresh from '@mui/icons-material/Refresh';
+
+import { ItemDialog } from './item_dlg';
 import { getItemsCount, getItemRating } from 'apis/ethereum';
+import { ratingContractContext } from 'apis/hooks';
 
 interface tableRow {
   id: number,
@@ -25,14 +28,14 @@ interface tableRow {
 }
 
 interface ItemsProps {
-  contractAddress: string
 }
 
 export default function Items(props: ItemsProps) {
 
-  const { contractAddress } = props;
+  const { contractAddress } = useContext(ratingContractContext);
 
   const [ dataFetched, setDataFetched ] = useState(true);
+  const [ open, setOpen ] = useState(false);
   const [ rows, setRows ] = useState<tableRow[]>([])
 
   useEffect(() => {
@@ -42,7 +45,6 @@ export default function Items(props: ItemsProps) {
   }, [contractAddress])
 
   const handleGetRatingContract = async () => {
-
     setDataFetched(false);
     const count = await getItemsCount(contractAddress);
     // @ts-ignore
@@ -64,6 +66,13 @@ export default function Items(props: ItemsProps) {
     return row;
   }
 
+  const handleDlgClose = (tx: string|null) => {
+    setOpen(false);
+    if (tx) {
+      handleGetRatingContract().then(() => {});
+    }
+  };
+
   return (
     <Box>
       <Toolbar
@@ -83,9 +92,13 @@ export default function Items(props: ItemsProps) {
           <IconButton>
             <Refresh></Refresh>
           </IconButton>
-        <Button variant='contained' sx={{whiteSpace:'nowrap'}}>Add Item</Button>
+        <Button variant='contained' sx={{whiteSpace:'nowrap'}} onClick={() => {setOpen(true)}}>Add Item</Button>
       </Toolbar>
       <ItemsTable dataFetched={dataFetched} rows={rows}></ItemsTable>
+      <ItemDialog
+        open={open}
+        onClose={handleDlgClose}
+      />
     </Box>
   )
 }

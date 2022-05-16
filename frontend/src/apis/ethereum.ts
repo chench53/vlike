@@ -5,7 +5,6 @@ import etherConfig from "./ether-config.json";
 import abi_rating from './abi/rating.json';
 import abi_rating_factory from './abi/rating_factory.json';
 import abi_vlike_token from './abi/vlike_token.json';
-import abi_pools from './abi/pools.json';
 
 const Web3 = require("web3");
 // const BN = require('bn.js');
@@ -26,8 +25,6 @@ const contractRatingFactoryAddress = process.env.REACT_APP_CONTRACT_RATING_FACTO
 const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiItem[], contractRatingFactoryAddress);
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
 const contractVlikeToke = new web3.eth.Contract(abi_vlike_token as AbiItem[], contractVlikeTokenAddress);
-// const contractPoolsAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
-// const contractPools = new web3.eth.Contract(abi_pools as AbiItem[], contractPoolsAddress);
 
 export const getEtherConfig = async () => {
   const chainId: string = await web3.eth.getChainId();
@@ -70,11 +67,7 @@ export const getRatingContractCount = async (user: string) => {
 }
 
 export const getRatingContract = async (user: string, index: number) => {
-  // try{
-    return await contractRatingFactory.methods.getContract(user, index).call();
-  // } catch(e) {
-  //   console.error(e);
-  // }
+  return await contractRatingFactory.methods.getContract(user, index).call();
 }
 
 export const getRatingContractBaseInfo = async (address: string) => {
@@ -85,6 +78,7 @@ export const getRatingContractBaseInfo = async (address: string) => {
     tokenEnabled: _baseInfo[1]
   }
 }
+
 
 export const rate = async (itemId: number, rating: number) => {
   return await contractRating.methods.rate(itemId, !!rating).send({from: ethereum.selectedAddress})
@@ -105,11 +99,16 @@ export const createRating = async (name: string, enableTokenAtInit: boolean) => 
   ).send({from: ethereum.selectedAddress})
 }
 
+export const addItem = async (ratingContractAddress: string, value: string) => {
+  const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
+  return await MyContractRating.methods.registerItem(value).send({from: ethereum.selectedAddress})
+}
+
 export const getItemsCount = async (ratingContractAddress: string) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
-  return await MyContractRating.methods.itemIdCounter().call() - 1;
+  return await MyContractRating.methods.itemIdCounter().call();
 }
 export const getItemRating = async (ratingContractAddress: string, itemId: number) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
-  return await MyContractRating.methods.itemMapping(itemId + 1).call({from: ethereum.selectedAddress});
+  return await MyContractRating.methods.itemMapping(itemId).call({from: ethereum.selectedAddress});
 }

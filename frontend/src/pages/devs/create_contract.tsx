@@ -42,7 +42,7 @@ interface RatingFormProps {
   handleSubmited: (tx: string|null) => void;
 }
 
-export function RatingForm(props: RatingFormProps) {
+function RatingForm(props: RatingFormProps) {
 
   const { handleSubmited } = props;
   
@@ -52,7 +52,7 @@ export function RatingForm(props: RatingFormProps) {
   }
   
   const [ valid, setValid ] = useState(false);
-  const [model, setModel] = useState<modeType>({
+  const [ model, setModel ] = useState<modeType>({
     name: '',
     enableTokenAtInit: false,
   })

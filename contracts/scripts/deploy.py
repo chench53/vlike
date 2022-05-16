@@ -69,7 +69,6 @@ REACT_APP_CHAIN_NETWORK={}
 REACT_APP_CONTRACT_RATING={}
 REACT_APP_CONTRACT_RATING_FACTORY={}
 REACT_APP_CONTRACT_VLIKE_TOKEN={}
-
     '''
     if network.show_active() in LOCAL_BLOCKCHAIN:
         path = '../frontend/.env.development.local'

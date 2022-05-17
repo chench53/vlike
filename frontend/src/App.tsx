@@ -8,6 +8,7 @@ import Footer from './components/footer';
 import Demo from './pages/demo';
 import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";
+import Item from "pages/item" ;
 import Faq from './pages/faq';
 import './App.css';
 
@@ -42,6 +43,11 @@ const routes = [
     path: 'dashboard/:contractAddress',
     element: Dashboard,
   },
+  {
+    name: 'dashboard',
+    path: 'dashboard/:address/item/:id',
+    element: Item,
+  },
 ]
 
 function App() {
@@ -55,13 +61,7 @@ function App() {
 
   const [ balance, setBalance ] = useState(0);
 
-  useEffect(() => {
-    refreshToken();
-  }, [currentAccount, onRightChain])
-  
   const refreshToken = () => {
-    console.log(currentAccount)
-    console.log(onRightChain)
     if (currentAccount && onRightChain) {
       getTokenBalance().then(x => { // string
         try {
@@ -75,6 +75,11 @@ function App() {
       setBalance(0);
     }
   }
+
+  useEffect(() => {
+    refreshToken();
+  }, [currentAccount, onRightChain])
+  
 
   return (
     <ThemeProvider theme={theme}>

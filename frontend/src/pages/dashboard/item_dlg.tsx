@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogTitle,
   FormControl,
-  FormControlLabel,
   TextField,
 } from '@mui/material';
 
@@ -49,14 +48,12 @@ interface ModelType {
 function ItemForm(props: ItemFormProps) {
 
   const { handleSubmited } = props;
-
   const { contractAddress } = useContext(ratingContractContext);
-
   const [ valid, setValid ] = useState(false);
   const [ model, setModel ] = useState<ModelType>(getDefaultModel())
 
   useEffect(() => {
-    if (model.value) {
+    if (model.value && checkValueValid(model.value)) {
       setValid(true);
     } else {
       setValid(false);
@@ -68,13 +65,17 @@ function ItemForm(props: ItemFormProps) {
       value: '',
     } as ModelType
   } 
-
+  
   function clear() {
     setModel(model => {
       return {...model, ...getDefaultModel()}
     })
   }
 
+  function checkValueValid(value: string) {
+    return /<\/?[a-z][\s\S]*>/i.test(value);
+  }
+  
   async function submit() {
     addItem(contractAddress, model.value).then(x => {
       handleSubmited(x);
@@ -88,14 +89,14 @@ function ItemForm(props: ItemFormProps) {
     <Container sx={{padding: 2}}>
       <FormControl sx={{ width: '60ch', gap: 2 }}>
         <TextField 
+          error={!valid}
           required
-          label="value" 
+          label="</>" 
           value={model.value}
-          helperText="Only support <iframe/> element in this form"
+          helperText="Only support embedd element in this form"
           multiline 
           rows={4}
           onChange={(e) => {
-            console.log('ppp')
             setModel(
               model => {
                 return {...model, ...{value: e.target.value}}

@@ -11,17 +11,18 @@ import { etherContext } from 'apis/use_wallet';
 import { getItem } from 'apis/ethereum';
 
 interface ContentProps {
+  address: string
   id: number
 }
 
 export default function Content(props: ContentProps) {
 
-  const { id } = props;
+  const { address, id } = props;
   const { currentAccount, currentChain } = useContext(etherContext);
   const [value, setValue] = useState('')
 
   useEffect(() => {
-    getItem(process.env.REACT_APP_CONTRACT_RATING || '', id).then(item => {
+    getItem(address, id).then(item => {
       setValue(item.urlData);
     })
   }, [currentAccount, currentChain])
@@ -32,7 +33,7 @@ export default function Content(props: ContentProps) {
         <Player value={value} />
       </CardContent>
       <CardActions>
-        <Info itemId={id} />
+        <Info address={address} itemId={id} />
       </CardActions>
     </Card>
   )

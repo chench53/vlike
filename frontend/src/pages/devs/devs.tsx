@@ -92,11 +92,11 @@ export default function Devs() {
           id="tableTitle"
           component="div"
         >
-          My Contracts
+          My Rating Contracts
+        </Typography>
           <IconButton disabled={!currentAccount} onClick={handleGetRatingContract}>
             <Refresh></Refresh>
           </IconButton>
-        </Typography>
         <Button variant='contained' disabled={!currentAccount} onClick={handleClickOpen}>New</Button>
       </Toolbar>
       <RatingsTable dataFetched={dataFetched} rows={rows}></RatingsTable>
@@ -118,7 +118,7 @@ export function RatingsTable(props: RatingsTableProps) {
   const { dataFetched, rows } = props;
 
   return (
-    <TableContainer component={Box}>
+    <TableContainer component={Paper}>
       { dataFetched || <LinearProgress sx={{ width: '100%'}}/>}
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -127,7 +127,6 @@ export function RatingsTable(props: RatingsTableProps) {
             <TableCell >Name</TableCell>
             <TableCell >Token enabled</TableCell>
             <TableCell >Balance</TableCell>
-
           </TableRow>
         </TableHead>
         <TableBody>

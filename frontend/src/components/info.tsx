@@ -31,11 +31,12 @@ function RatingOption(props: RatingOptionProps) {
 }
 
 interface InfoProps {
+  address: string,
   itemId: number
 }
 
 export default function Info(props: InfoProps) {
-  const { itemId } = props;
+  const { address, itemId } = props;
   const [hasRated, setHasRated] = useState(false);
   const [myRating, setMyRating] = useState<number | undefined>(undefined);
   const [ratingCount, setRatingCount] = useState([0, 0])
@@ -55,12 +56,12 @@ export default function Info(props: InfoProps) {
   useEffect(() => {
     fetchCurrentRatingInfo()
   }, [currentAccount, currentChain])
-
+  
   function fetchCurrentRatingInfo() {
-    getRatingCount(itemId).then(data => {
+    getRatingCount(address, itemId).then(data => {
       setRatingCount([data[0], data[1]])
     })
-    getUserRating(itemId).then(data => {
+    getUserRating(address, itemId).then(data => {
       setHasRated(data[0]);
       // console.log(data)
       if (data[0] === true) {
@@ -71,7 +72,7 @@ export default function Info(props: InfoProps) {
   }
 
   function giveRating(score: number) {
-    rate(itemId, score).then(() => {
+    rate(address, itemId, score).then(() => {
       fetchCurrentRatingInfo()
     })
   }

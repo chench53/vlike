@@ -58,7 +58,6 @@ function RatingForm(props: RatingFormProps) {
   })
 
   useEffect(() => {
-    console.log('model.name')
     if (model.name) {
       setValid(true);
     } else {
@@ -79,9 +78,12 @@ function RatingForm(props: RatingFormProps) {
     <Container maxWidth="sm" sx={{ marginBottom: 2 }}>
       <Box>
         <FormControl sx={{ width: '40ch', gap: 2 }}>
-          <TextField label="Name" variant="standard" onChange={(e) => {
-            setModel(Object.assign(model, {name: e.target.value}))
-            setValid(true);
+          <TextField required label="Name" variant="standard" onChange={(e) => {
+            setModel(
+              model => {
+                return {...model, ...{name: e.target.value}}
+              }
+            )
           }} />
           <FormControlLabel
             control={
@@ -96,8 +98,8 @@ function RatingForm(props: RatingFormProps) {
             label="enable tokens"
           />
         </FormControl>
-        <Box sx={{ marginTop: 4 }}>
-          <Button variant="contained" disabled={!valid} onClick={formSubmit}>Create Contract</Button>
+        <Box sx={{ marginTop: 4, textAlign:'end' }}>
+          <Button variant="contained" disabled={!valid} onClick={formSubmit}>Create</Button>
         </Box>
       </Box>
     </Container>

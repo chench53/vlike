@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { Link } from "react-router-dom";
 import {
   Box,
   Button,
@@ -11,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Toolbar,
+  Tooltip,
   Typography,
   Paper
 } from '@mui/material';
@@ -56,7 +58,7 @@ export default function Items(props: ItemsProps) {
 
   const getRow = async (contractAddress: string, i: number) => {
     const item = await getItem(contractAddress, i);
-    console.log(item)
+    // console.log(item)
     let row = {
       id: item.itemID,
       value: item.urlData,
@@ -111,6 +113,17 @@ interface TableProps {
 function ItemsTable(props: TableProps) {
 
   const { dataFetched, rows } = props;
+  const { contractAddress } = useContext(ratingContractContext);
+
+  function shortValue(value: string) {
+    const parser = new DOMParser();
+    var htmlDoc = parser.parseFromString(value, 'text/html');
+    var tag = htmlDoc.body.firstElementChild?.nodeName;
+    if (tag) {
+      tag = `<${tag.toLowerCase()}...`
+    }
+    return tag;
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -119,7 +132,7 @@ function ItemsTable(props: TableProps) {
         <TableHead>
           <TableRow>
             <TableCell style={{ width: 40 }}>id</TableCell>
-            <TableCell>value</TableCell>
+            <TableCell style={{ width: 160 }}>value</TableCell>
             <TableCell style={{ width: 80 }} align="right">like</TableCell>
             <TableCell style={{ width: 80 }} align="right">dislike</TableCell>
           </TableRow>
@@ -128,11 +141,27 @@ function ItemsTable(props: TableProps) {
           {rows.map((row) => (
             <TableRow
               key={row.id}
+              component={Link} to={`/dashboard/${contractAddress}/item/${row.id}`}
+              sx={{ 
+                textDecoration: 'none'
+              }}
             >
               <TableCell component="th" scope="row">
                 {row.id}
               </TableCell>
-              <TableCell>{row.value}</TableCell>
+              <TableCell sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                // whiteSpace: "nowrap"
+              }}>
+                {/* <Button> */}
+                <Tooltip title={row.value}>
+                  <span>
+                    {shortValue(row.value)}
+                  </span>
+                </Tooltip>
+                {/* </Button> */}
+              </TableCell>
               <TableCell align="right">{row.like}</TableCell>
               <TableCell align="right">{row.dislike}</TableCell>
             </TableRow>

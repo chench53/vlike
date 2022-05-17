@@ -1,4 +1,4 @@
-import { useEffect, createContext, useState } from 'react';
+import { createContext } from 'react';
 
 interface contractType {
   contractAddress: string

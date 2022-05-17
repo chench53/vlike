@@ -1,9 +1,8 @@
-import { useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Alert } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { useWallet, etherContext } from './apis/use_wallet';
 import Header from './components/header';
 import Footer from './components/footer';
 import Demo from './pages/demo';
@@ -11,6 +10,10 @@ import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";
 import Faq from './pages/faq';
 import './App.css';
+
+import { useWallet, etherContext } from './apis/use_wallet';
+import { useTokenContext } from './apis/hooks';
+import { getTokenBalance } from './apis/ethereum';
 
 const theme = createTheme({
   palette: {
@@ -50,25 +53,53 @@ function App() {
     onRightChain
   } = useWallet();
 
+  const [ balance, setBalance ] = useState(0);
+
+  useEffect(() => {
+    refreshToken();
+  }, [currentAccount, onRightChain])
+  
+  const refreshToken = () => {
+    console.log(currentAccount)
+    console.log(onRightChain)
+    if (currentAccount && onRightChain) {
+      getTokenBalance().then(x => { // string
+        try {
+          const balanceInWei = parseInt(x);
+          setBalance(balanceInWei/(10**18));
+        } catch (error) {
+          console.error(error);
+        }
+      })
+    } else {
+      setBalance(0);
+    }
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <etherContext.Provider value={{
-        currentAccount,
-        setCurrentAccount,
-        currentChain,
-        SetCurrentChain,
-        onRightChain,
+      <Box sx={{
+        bgcolor: 'background.default',
+        color: 'text.primary',
+        minHeight: '100vh',
       }}>
-        <Box sx={{
-          bgcolor: 'background.default',
-          color: 'text.primary',
-          minHeight: '100vh',
+        <etherContext.Provider value={{
+          currentAccount,
+          setCurrentAccount,
+          currentChain,
+          SetCurrentChain,
+          onRightChain,
         }}>
-          <Header />
-          <Main />
+          <useTokenContext.Provider value={{
+            balance: balance,
+            refreshToken: refreshToken
+          }}>
+            <Header />
+            <Main />
+          </useTokenContext.Provider>
           <Footer />
-        </Box>
-      </etherContext.Provider>
+        </etherContext.Provider>
+      </Box>
     </ThemeProvider>
   );
 }

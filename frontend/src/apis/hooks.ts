@@ -1,9 +1,18 @@
-import { createContext } from 'react';
+import { useEffect, createContext, useState } from 'react';
 
-interface ratingContractType {
+interface contractType {
   contractAddress: string
 }
 
-export const ratingContractContext = createContext<ratingContractType>({
+export const ratingContractContext = createContext<contractType>({
   contractAddress: '',
+});
+
+interface useTokenType {
+  balance: number,
+  refreshToken?: () => void, 
+}
+
+export const useTokenContext = createContext<useTokenType>({
+  balance: 0,
 });

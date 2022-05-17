@@ -43,15 +43,6 @@ export const getEtherConfig = async () => {
 
 export const setTag = async (name: string) => {
   return await contractVlikeToke.methods.setTag(name).send({from: ethereum.selectedAddress});
-  // const txParams = {
-  //   to: contractVlikeTokenAddress,
-  //   from: ethereum.selectedAddress,
-  //   data: contractVlikeToke.methods.setTag(name).encodeABI()
-  // }
-  // return await ethereum.request({
-  //   method: 'eth_sendTransaction',
-  //   params: [txParams]
-  // })
 }
 
 export const getRatingCount = async (itemId: number) => {
@@ -111,4 +102,12 @@ export const getItemsCount = async (ratingContractAddress: string) => {
 export const getItem = async (ratingContractAddress: string, itemId: number) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
   return await MyContractRating.methods.itemMapping(itemId).call({from: ethereum.selectedAddress});
+}
+
+export const getTokenBalance = async () => {
+  return await contractVlikeToke.methods.balanceOf(ethereum.selectedAddress).call();
+}
+
+export const requestTokens = async () => {
+  return await contractVlikeToke.methods.requestTokens().send({from: ethereum.selectedAddress});
 }

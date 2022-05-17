@@ -13,9 +13,10 @@ from brownie import (
 from web3 import constants, Web3
 
 from .tools import get_account, get_contract, fund_with_link, INITIAL_SUPPLY, LOCAL_BLOCKCHAIN
-from .setup import add_items
+from .setup import add_items, allow_request
 
 default_deployment_config = {
+    'allow': 1000000,
     'items': [
         '<iframe width="560" height="315" src="https://www.youtube.com/embed/lRba55HTK0Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
         '<blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">The bots are angry at being counted 🤣</p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/1525305145239781377?ref_src=twsrc%5Etfw">May 14, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'
@@ -59,10 +60,10 @@ def _get_rating(rating_factory_contract, user):
     rating_contract = Contract.from_abi('rating', rating_contract_address, Rating.abi)
     return rating_contract
 
-def _setup(rating_contract):
+def _setup(token_contract, rating_factory_contract, rating_contract):
     account = get_account()
     tx_link = fund_with_link(rating_contract.address)
-    tx_link.wait(1)
+    allow_request(token_contract, Web3.toWei(default_deployment_config['allow'], 'ether'))
     for i in default_deployment_config['items']:
         rating_contract.registerItem(i, {"from": account})
     # add_items(default_deployment_config['items'])
@@ -116,6 +117,6 @@ def __sub_name(name):
 
 def main():
     token_contract, rating_factory_contract, rating_contract = deplopy_all()
-    _setup(rating_contract)
+    _setup(token_contract, rating_factory_contract, rating_contract)
     _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract)
     _write_frontend_end_abi(token_contract, rating_contract, rating_factory_contract)

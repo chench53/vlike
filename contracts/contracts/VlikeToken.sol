@@ -7,14 +7,25 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract VlikeToken is ERC20 {
 
     string public tag;
+    address public owner;
 
     constructor(uint256 initialSupply) ERC20("VlikeToken", "VLIKE") {
-        _mint(msg.sender, initialSupply);
+        owner = msg.sender;
+        _mint(owner, initialSupply);
     }
 
     // for debug
     function setTag(string memory _tag) external returns (string memory) {
         tag = _tag;
         return tag;
+    }
+
+    function requestTokens() external {
+        this.transferFrom(owner, msg.sender, _ether(10));
+    }
+
+    // ether to wei
+    function _ether(uint256 amountInEther) internal pure returns (uint256 amountInWei) {
+        return amountInEther * 10 **18;
     }
 }

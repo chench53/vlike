@@ -2,7 +2,7 @@
 run tests:
     brownie test tests/test_rating.py -s
 run a test function:
-    brownie test tests/test_rating.py -k test_rating_with_tokens -s
+    brownie test tests/test_rating.py -k TestRating::test_rating_with_tokens -s
     brownie test tests/test_rating.py -k test_rating_factory -s
 """
 
@@ -19,7 +19,7 @@ from brownie import (
 import pytest
 from web3 import constants, Web3
 
-from scripts.tools import get_account, get_contract, LOCAL_BLOCKCHAIN, INITIAL_SUPPLY
+from scripts.tools import get_account, get_contract, fund_with_link, LOCAL_BLOCKCHAIN, INITIAL_SUPPLY
 from scripts.deploy import deplopy_contract, deplopy_all
 from scripts.setup import add_items
 
@@ -31,6 +31,8 @@ def setup_module():
 class TestRating():
 
     def setup_class(self):
+        if network.show_active() not in LOCAL_BLOCKCHAIN:
+            pytest.skip()
         print('setup')
 
         self.token_contract = deplopy_contract(
@@ -45,9 +47,6 @@ class TestRating():
         print('teardown')
 
     def test_rating(self):
-        if network.show_active() not in LOCAL_BLOCKCHAIN:
-            pytest.skip()
-
         user1 = get_account(1)
     
         name = 'unittest'
@@ -82,9 +81,6 @@ class TestRating():
 
 
     def test_rating_with_tokens(self):
-        if network.show_active() not in LOCAL_BLOCKCHAIN:
-            pytest.skip()
-
         account = get_account() # owner of contracts
         user1 = get_account(1)
         user2 = get_account(2)
@@ -93,6 +89,7 @@ class TestRating():
         pools_contract_address = rating_contract.pools()
         pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
         itemId = add_items(rating_contract, "abc")['item_id']
+        fund_with_link(rating_contract.address)
 
         stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
         token_contract.approve(rating_contract, stake_amount, {'from': user1})
@@ -134,11 +131,7 @@ class TestRating():
 
 
     def test_rating_factory(self):
-        if network.show_active() not in LOCAL_BLOCKCHAIN:
-            pytest.skip()
-
         user1 = get_account(1)
-
         token_contract = self.token_contract
         rating_factory_contract = self.rating_factory_contract
         name = 'unittest'

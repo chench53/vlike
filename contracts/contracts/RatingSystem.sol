@@ -117,7 +117,7 @@ contract Rating is VRFConsumerBase {
         emit registerEvent(itemIdCounter, _urlData);
 
         itemIdCounter += 1;
-        return itemIdCounter;
+        return item.itemID;
     }
 
     function rate(uint256 _itemId, bool _score) public returns(bool success){

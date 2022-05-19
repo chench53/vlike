@@ -11,9 +11,6 @@ def add_items(rating_contract, *items):
         t = rating_contract.registerItem(i, {"from": account})
         txs.append(t)
     if network.show_active() in LOCAL_BLOCKCHAIN:
-        # return {
-        #     'item_id': t.return_value
-        # }
         return {
             'items': [{'id': t.return_value} for t in txs]
         }

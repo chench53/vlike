@@ -1,4 +1,4 @@
-import { useState, useContext, MouseEvent } from "react";
+import { useState, useContext, useMemo, MouseEvent } from "react";
 import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box, Popover } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -8,17 +8,21 @@ import { connectWallet, etherContext } from 'apis/use_wallet';
 import { useTokenContext } from 'apis/hooks';
 import { requestTokens } from 'apis/ethereum';
 
-interface HeaderProps { }
+interface HeaderProps { 
+  handleSetTheme: (arg0: 'light' | 'dark') => void
+}
 
 export default function Header(props: HeaderProps) {
 
-  const { currentAccount, setCurrentAccount} = useContext(etherContext);
+  const { handleSetTheme } = props;
+
+  const { currentAccount, setCurrentAccount } = useContext(etherContext);
 
   const NavTabs = [
     {
       name: 'Examples',
       to: '/example',
-    }, 
+    },
     {
       name: 'Devs',
       to: '/devs',
@@ -26,27 +30,30 @@ export default function Header(props: HeaderProps) {
     {
       name: 'FAQ',
       to: '/faq',
-    }, 
+    },
   ]
 
   return (
     <Box>
-      <Toolbar sx={{ 
-        borderBottom: 1, 
+      <Toolbar sx={{
+        borderBottom: 1,
         borderColor: 'divider',
-        }}>
-          <NavLink to="/" style={{textDecoration: 'none'}}>
-            Vlike
+      }}>
+        <NavLink to="/" style={{ textDecoration: 'none' }}>
+          Vlike
         </NavLink>
-        <div className="headerdiv">
-            <input type="checkbox" className="checkbox" id="chk" />
-            <label className="label" htmlFor="chk">
-              <LightModeIcon className="licon"/>
-              <DarkModeIcon className="dicon"/>
-              <div className="ball"></div>
-            </label>
-          </div>
+
         <Box sx={{ flex: 1 }} />
+        <div className="headerdiv">
+          <input type="checkbox" className="checkbox" id="chk" onChange={e => {
+            handleSetTheme(e.target.checked ? 'light':'dark')
+          }}/>
+          <label className="label" htmlFor="chk">
+            <LightModeIcon className="licon" />
+            <DarkModeIcon className="dicon" />
+            <div className="ball"></div>
+          </label>
+        </div>
 
         {
           NavTabs.map(x => {
@@ -55,7 +62,7 @@ export default function Header(props: HeaderProps) {
                 textTransform: 'none',
                 marginRight: 2,
               }}>
-                <NavLink to={x.to} style={({isActive}) => ({
+                <NavLink to={x.to} style={({ isActive }) => ({
                   textDecoration: 'none',
                   // color: isActive ? "gray" : ""
                   // color: 'white'
@@ -80,9 +87,9 @@ export default function Header(props: HeaderProps) {
 }
 
 function TokensButton() {
-  const { currentAccount, onRightChain} = useContext(etherContext);
+  const { currentAccount, onRightChain } = useContext(etherContext);
   const { balance, refreshToken } = useContext(useTokenContext);
-  
+
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
@@ -96,36 +103,36 @@ function TokensButton() {
   const open = Boolean(anchorEl);
 
   return (
-    <Box sx={{display: 'inline'}}>
-      <Button 
-      variant='text' 
-      color='success' 
-      onMouseEnter={handlePopoverOpen}
-      onMouseLeave={handlePopoverClose}
-      onClick={() => {
-        requestTokens().then(() => {
-          refreshToken && refreshToken();
-        })
-      }}
-      disabled={!(currentAccount&&onRightChain)} 
-      sx={{
-      marginRight: 1,
-      textTransform: 'none',
-    }}>Tokens: {balance}</Button>
-  
-    <Popover
-      open={open}
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'left',
-      }}
-      sx={{
-        pointerEvents: 'none',
-      }}
-      onClose={handlePopoverClose}
-      disableRestoreFocus
-    >Request 10 Vlike Tokens</Popover>
+    <Box sx={{ display: 'inline' }}>
+      <Button
+        variant='text'
+        color='success'
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+        onClick={() => {
+          requestTokens().then(() => {
+            refreshToken && refreshToken();
+          })
+        }}
+        disabled={!(currentAccount && onRightChain)}
+        sx={{
+          marginRight: 1,
+          textTransform: 'none',
+        }}>Tokens: {balance}</Button>
+
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        sx={{
+          pointerEvents: 'none',
+        }}
+        onClose={handlePopoverClose}
+        disableRestoreFocus
+      >Request 10 Vlike Tokens</Popover>
     </Box>
   )
 }

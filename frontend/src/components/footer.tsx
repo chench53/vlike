@@ -44,8 +44,8 @@ export default function Footer(props: FooterProps) {
   ]
 
   return (
-    <div className='footerdiv'>
-      <AppBar position="relative" sx={{ height: 100, borderTop: 1, borderColor: 'divider', top: 'auto', bottom: -275}}>
+    // <div className='footerdiv'>
+      <Box position="relative" sx={{ height: 100, borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 1}}>
         <Box position='relative' sx={{ marginLeft: 15, bottom: -50, height: 57, width: 57 }}>
           <a target="_blank"  rel="noreferrer" href='https://chench53.gitbook.io/hackathon/'><img src={logo} alt=''/></a>
         </Box>
@@ -61,7 +61,7 @@ export default function Footer(props: FooterProps) {
             }
           </Box>
         </Box>
-        </AppBar>
-      </div>
+        </Box>
+      // </div>
   );
 }

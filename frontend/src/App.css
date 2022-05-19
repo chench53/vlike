@@ -61,16 +61,13 @@ a:hover {
 }
 
 
-.footerdiv {
+/* .footerdiv {
   background-color: #121212;
   min-height: 50vh;
-}
+} */
 
 
 /* toggle theme  */
-body.dark {
-  background: #292C35;
-}
 
 .checkbox {
   position: absolute;
@@ -78,8 +75,7 @@ body.dark {
 }
 
 .label {
-  margin-left: 100px;
-  margin-top: -11px;
+  margin-left: 30px;
   background-color: rgb(49, 49, 49);
   border-radius: 50px;
   cursor: pointer;
@@ -119,11 +115,21 @@ body.dark {
   transform: scale(.8)
 }
 
+.headerdiv {
+  /* margin-top: 7px; */
+  margin-right: 24px;
+} 
+
+
+/*
+body.dark {
+  background: #292C35;
+}
+
+
 .vlike {
   margin-top: -5px;
   position: absolute;
 }
 
-.headerdiv {
-  margin-top: 7px;
-}
+*/

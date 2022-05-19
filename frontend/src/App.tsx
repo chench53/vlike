@@ -1,14 +1,14 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Alert } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 
 import Header from './components/header';
 import Footer from './components/footer';
 import Examples from './pages/examples';
 import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";
-import Item from "pages/item" ;
+import Item from "pages/item";
 import Faq from './pages/faq';
 import './App.css';
 
@@ -16,11 +16,13 @@ import { useWallet, etherContext } from './apis/use_wallet';
 import { useTokenContext } from './apis/hooks';
 import { getTokenBalance } from './apis/ethereum';
 
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
+// const theme = createTheme({
+//   palette: {
+//     mode: 'dark',
+//   },
+// });
+
+
 
 const routes = [
   {
@@ -51,6 +53,10 @@ const routes = [
 ]
 
 function App() {
+
+  // const theme = useTheme();
+  const [mode, setMode] = useState<'light' | 'dark'>('dark');
+
   const {
     currentAccount,
     setCurrentAccount,
@@ -59,14 +65,37 @@ function App() {
     onRightChain
   } = useWallet();
 
-  const [ balance, setBalance ] = useState(0);
+  const [balance, setBalance] = useState(0);
+
+
+  // var theme = createTheme({
+  //   palette: {
+  //     mode: 'dark',
+  //   },
+  // });
+
+  const handleSetTheme = (mode: 'light' | 'dark') => {
+    setMode(mode);
+  }
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: mode,
+        }
+      }),
+    [mode]
+  );
+
+
 
   const refreshToken = () => {
     if (currentAccount && onRightChain) {
       getTokenBalance().then(x => { // string
         try {
           const balanceInWei = parseInt(x);
-          setBalance(balanceInWei/(10**18));
+          setBalance(balanceInWei / (10 ** 18));
         } catch (error) {
           console.error(error);
         }
@@ -79,7 +108,7 @@ function App() {
   useEffect(() => {
     refreshToken();
   }, [currentAccount, onRightChain])
-  
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -99,11 +128,11 @@ function App() {
             balance: balance,
             refreshToken: refreshToken
           }}>
-            <Header />
+            <Header handleSetTheme={handleSetTheme} />
             <Main />
           </useTokenContext.Provider>
-          <Footer />
         </etherContext.Provider>
+        <Footer />
       </Box>
     </ThemeProvider>
   );

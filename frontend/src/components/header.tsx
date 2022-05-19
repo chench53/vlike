@@ -18,16 +18,16 @@ export default function Header(props: HeaderProps) {
 
   const { currentAccount, setCurrentAccount } = useContext(etherContext);
 
-  const NavTabs = [
-    {
-      name: 'Devs',
-      to: '/devs',
-    },
-    {
-      name: 'FAQ',
-      to: '/faq',
-    },
-  ]
+  // const NavTabs = [
+  //   {
+  //     name: 'Devs',
+  //     to: '/devs',
+  //   },
+  //   {
+  //     name: 'FAQ',
+  //     to: '/faq',
+  //   },
+  // ]
 
   return (
     <Box>

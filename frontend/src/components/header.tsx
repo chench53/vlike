@@ -21,7 +21,7 @@ export default function Header(props: HeaderProps) {
   const NavTabs = [ 
     {
       name: 'Examples',
-      to: '/example',
+      to: '/examples',
     },
     {
       name: 'Devs',

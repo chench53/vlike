@@ -65,6 +65,7 @@ export const getRatingContractBaseInfo = async (address: string) => {
 
 export const rate = async (ratingContractAddress: string, itemId: number, rating: number) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
+  await contractVlikeToke.methods.approve(ratingContractAddress, Web3.utils.toWei('100', 'ether')).send({from: ethereum.selectedAddress})
   return await MyContractRating.methods.rate(itemId, !!rating).send({from: ethereum.selectedAddress})
 }
 

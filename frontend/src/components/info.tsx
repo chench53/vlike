@@ -4,6 +4,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 import { etherContext } from 'apis/use_wallet';
+import { useTokenContext } from 'apis/hooks';
 import { getRatingCount, getUserRating, rate } from 'apis/ethereum';
 
 const { ethereum } = window;
@@ -38,10 +39,11 @@ interface InfoProps {
 
 export default function Info(props: InfoProps) {
   const { address, itemId } = props;
-  const [hasRated, setHasRated] = useState(false);
-  const [myRating, setMyRating] = useState<number | undefined>(undefined);
-  const [ratingCount, setRatingCount] = useState([0, 0])
+  const [ hasRated, setHasRated ] = useState(false);
+  const [ myRating, setMyRating ] = useState<number | undefined>(undefined);
+  const [ ratingCount, setRatingCount ] = useState([0, 0])
   const { currentAccount, currentChain } = useContext(etherContext);
+  const { refreshToken } = useContext(useTokenContext);
 
   const ratingOptions = [
     {
@@ -72,6 +74,7 @@ export default function Info(props: InfoProps) {
         console.log('setMyRating')
       }
     })
+    refreshToken && refreshToken();
   }
 
   function giveRating(score: number) {

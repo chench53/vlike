@@ -16,13 +16,6 @@ import { useWallet, etherContext } from './apis/use_wallet';
 import { useTokenContext } from './apis/hooks';
 import { getTokenBalance } from './apis/ethereum';
 
-// const theme = createTheme({
-//   palette: {
-//     mode: 'dark',
-//   },
-// });
-
-
 
 const routes = [
   {
@@ -54,7 +47,6 @@ const routes = [
 
 function App() {
 
-  // const theme = useTheme();
   const [mode, setMode] = useState<'light' | 'dark'>('dark');
 
   const {
@@ -66,13 +58,6 @@ function App() {
   } = useWallet();
 
   const [balance, setBalance] = useState(0);
-
-
-  // var theme = createTheme({
-  //   palette: {
-  //     mode: 'dark',
-  //   },
-  // });
 
   const handleSetTheme = (mode: 'light' | 'dark') => {
     setMode(mode);
@@ -87,8 +72,6 @@ function App() {
       }),
     [mode]
   );
-
-
 
   const refreshToken = () => {
     if (currentAccount && onRightChain) {

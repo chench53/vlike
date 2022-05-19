@@ -44,22 +44,24 @@ export default function Footer(props: FooterProps) {
   ]
 
   return (
-    <AppBar position="fixed" sx={{ borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 0}}>
-      <Box position='fixed' sx={{ marginLeft: 15, marginTop: 3, bottom: -10, height: 57, width: 57 }}>
-        <a target="_blank"  rel="noreferrer" href='https://chench53.gitbook.io/hackathon/'><img src={logo} alt=''/></a>
-      </Box>
-      <Box sx={{ marginLeft: 4, display: 'flex'}} >
-        <p>&copy; Vlike 2022</p>
-        <Box sx={{ display: 'flex', gap: 1, marginLeft: 6 }}>
-          {
-            bottomNavBtnData.map(x => {
-              return (
-                <BottomNavBtn key={x.name} name={x.name} icon={x.icon} href={x.href}></BottomNavBtn>
-              )
-            })
-          }
+    <div className='footerdiv'>
+      <AppBar position="relative" sx={{ height: 100, borderTop: 1, borderColor: 'divider', top: 'auto', bottom: -275}}>
+        <Box position='relative' sx={{ marginLeft: 15, bottom: -50, height: 57, width: 57 }}>
+          <a target="_blank"  rel="noreferrer" href='https://chench53.gitbook.io/hackathon/'><img src={logo} alt=''/></a>
         </Box>
-      </Box>
-    </AppBar>
+        <Box sx={{ marginLeft: 4, display: 'flex'}} >
+          <p>&copy; Vlike 2022</p>
+          <Box sx={{ display: 'flex', gap: 1, marginLeft: 6}}>
+            {
+              bottomNavBtnData.map(x => {
+                return (
+                  <BottomNavBtn key={x.name} name={x.name} icon={x.icon} href={x.href}></BottomNavBtn>
+                )
+              })
+            }
+          </Box>
+        </Box>
+        </AppBar>
+      </div>
   );
 }

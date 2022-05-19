@@ -18,7 +18,7 @@ export default function Header(props: HeaderProps) {
 
   const { currentAccount, setCurrentAccount } = useContext(etherContext);
 
-  const NavTabs = [
+  const NavTabs = [ 
     {
       name: 'Examples',
       to: '/example',
@@ -39,13 +39,13 @@ export default function Header(props: HeaderProps) {
         borderBottom: 1,
         borderColor: 'divider',
       }}>
-        <NavLink to="/" style={{ textDecoration: 'none' }}>
+        <NavLink className='lightmode' to="/" style={{ textDecoration: 'none' }}>
           Vlike
         </NavLink>
 
         <Box sx={{ flex: 1 }} />
         <div className="headerdiv">
-          <input type="checkbox" className="checkbox" id="chk" onChange={e => {
+          <input type="checkbox" className="checkbox" id="chk" onChange={e => {change()
             handleSetTheme(e.target.checked ? 'light':'dark')
           }}/>
           <label className="label" htmlFor="chk">
@@ -54,7 +54,7 @@ export default function Header(props: HeaderProps) {
             <div className="ball"></div>
           </label>
         </div>
-
+       
         {
           NavTabs.map(x => {
             return (
@@ -62,15 +62,16 @@ export default function Header(props: HeaderProps) {
                 textTransform: 'none',
                 marginRight: 2,
               }}>
-                <NavLink to={x.to} style={({ isActive }) => ({
+                <NavLink className='lightmode' to={x.to} style={() => ({
                   textDecoration: 'none',
-                  // color: isActive ? "gray" : ""
-                  // color: 'white'
+                    // color: isActive ? "gray" : "",
+                    // color: 'white'
                 })}>{x.name}</NavLink>
               </Button>
             )
           })
-        }
+          }
+          
 
         <TokensButton></TokensButton>
 
@@ -85,6 +86,13 @@ export default function Header(props: HeaderProps) {
     </Box>
   );
 }
+
+function change() {
+  var get = document.querySelector('.lightmode');
+  get?.classList.toggle("black")
+}
+document.querySelector(".checkbox")?.addEventListener("toggle", change);
+
 
 function TokensButton() {
   const { currentAccount, onRightChain } = useContext(etherContext);

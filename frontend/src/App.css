@@ -38,8 +38,14 @@
   background-color: peru;
 }
 
+
+
+.black {
+  color: black;
+}
+
 .App-link {
-  color: #61dafb;
+  color: #b4ff04;
 }
 
 @keyframes App-logo-spin {

@@ -61,10 +61,7 @@ a:hover {
 }
 
 
-/* .footerdiv {
-  background-color: #121212;
-  min-height: 50vh;
-} */
+
 
 
 /* toggle theme  */
@@ -116,20 +113,17 @@ a:hover {
 }
 
 .headerdiv {
-  /* margin-top: 7px; */
   margin-right: 24px;
 } 
 
 
-/*
-body.dark {
-  background: #292C35;
+
+
+
+.devbox {
+  min-height: 100vh;
 }
 
-
-.vlike {
-  margin-top: -5px;
-  position: absolute;
+.faqbox {
+  min-height: 100vh;
 }
-
-*/

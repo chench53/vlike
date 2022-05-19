@@ -3,7 +3,7 @@ import { Box, Container } from '@mui/material';
 export default function Faq() {
 
   return (
-    <Container maxWidth="sm">
+    <Container className='faqbox' maxWidth="sm">
       <Box><h1>Frequently Asked Questions</h1>
         <li>
           <h3>Why should I pay to rate content?</h3>

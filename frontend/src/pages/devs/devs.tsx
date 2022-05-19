@@ -77,7 +77,7 @@ export default function Devs() {
   }
 
   return (
-    <Box sx={{
+    <Box className='devbox' sx={{
       margin: '0 20%'
     }}>
       <Toolbar

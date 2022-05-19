@@ -133,3 +133,12 @@ body.dark {
 }
 
 */
+
+
+.devbox {
+  min-height: 100vh;
+}
+
+.faqbox {
+  min-height: 100vh;
+}

@@ -2,8 +2,8 @@
 run tests:
     brownie test tests/test_rating.py -s
 run a test function:
-    brownie test tests/test_rating.py -k TestRating::test_rating_with_tokens -s
-    brownie test tests/test_rating.py -k test_rating_factory -s
+    brownie test tests/test_rating.py -k test_rating -s
+    brownie test tests/test_rating.py -k test_rating_with_tokens -s
 """
 
 from brownie import (
@@ -20,13 +20,21 @@ import pytest
 from web3 import constants, Web3
 
 from scripts.tools import get_account, get_contract, fund_with_link, LOCAL_BLOCKCHAIN, INITIAL_SUPPLY
-from scripts.deploy import deplopy_contract, deplopy_all
+from scripts.deploy import deplopy_contract, _deplopy_all, _get_rating
 from scripts.setup import add_items
 
-_USERS = {}
 
 def setup_module():
     print('setup_module')
+    global token_contract
+    global rating_factory_contract
+    token_contract = deplopy_contract(
+        VlikeToken, 
+        Web3.toWei(INITIAL_SUPPLY, 'ether'),
+    )
+    rating_factory_contract = deplopy_contract(
+        RatingFactory
+    )
 
 class TestRating():
 
@@ -35,13 +43,6 @@ class TestRating():
             pytest.skip()
         print('setup')
 
-        self.token_contract = deplopy_contract(
-            VlikeToken, 
-            Web3.toWei(INITIAL_SUPPLY, 'ether'),
-        )
-        self.rating_factory_contract = deplopy_contract(
-            RatingFactory
-        )
 
     def teardown_class(self):
         print('teardown')
@@ -61,7 +62,10 @@ class TestRating():
             config["networks"][network.show_active()]["fee"],
             config["networks"][network.show_active()]["keyhash"],
         )
-        itemId = add_items(rating_contract, "abc", "xyz")['item_id']
+        items = add_items(rating_contract, "abc", "xyz")['items']
+        print(items)
+        itemId = items[0]['id']
+
 
         # rating info on (hasVoted, rating)
         ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})
@@ -85,10 +89,24 @@ class TestRating():
         user1 = get_account(1)
         user2 = get_account(2)
 
-        token_contract, _, rating_contract = deplopy_all(True)
+        # token_contract, _, rating_contract = _deplopy_all(True)
+        rating_factory_contract.createRatingSystemContract(
+            'dev',
+            token_contract, 
+            True,
+            100,
+            get_contract("vrf_coordinator").address,
+            get_contract("link_token").address,
+            config["networks"][network.show_active()]["fee"],
+            config["networks"][network.show_active()]["keyhash"],
+            {'from': account}
+        ).wait(1)
+
+        rating_contract = _get_rating(rating_factory_contract, account, 0)
+
         pools_contract_address = rating_contract.pools()
         pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
-        itemId = add_items(rating_contract, "abc")['item_id']
+        itemId = add_items(rating_contract, "abc")['items'][0]['id']
         fund_with_link(rating_contract.address)
 
         stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
@@ -128,30 +146,3 @@ class TestRating():
         # breakpoint()
         with pytest.raises(exceptions.VirtualMachineError): # pool is reset
             pools_contract.itemPoolMapping(itemId, rating, 0)
-
-
-    def test_rating_factory(self):
-        user1 = get_account(1)
-        token_contract = self.token_contract
-        rating_factory_contract = self.rating_factory_contract
-        name = 'unittest'
-        tx = rating_factory_contract.createRatingSystemContract(
-            name,
-            token_contract,
-            False,
-            100,
-            get_contract("vrf_coordinator").address,
-            get_contract("link_token").address,
-            config["networks"][network.show_active()]["fee"],
-            config["networks"][network.show_active()]["keyhash"],
-            {'from': user1}
-        )
-        tx.wait(1)
-        print(tx.return_value)
-        assert tx.return_value
-
-        assert rating_factory_contract.getContractCount(user1) == 1
-        assert rating_factory_contract.getContract(user1, 0) == tx.return_value
-
-        with pytest.raises(exceptions.VirtualMachineError, match = 'index') as e: 
-            rating_factory_contract.getContract(user1, 1)

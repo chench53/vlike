@@ -22,10 +22,12 @@ export default function Content(props: ContentProps) {
   const [value, setValue] = useState('')
 
   useEffect(() => {
-    getItem(address, id).then(item => {
-      setValue(item.urlData);
-    })
-  }, [currentAccount, currentChain])
+    if (address) {
+      getItem(address, id).then(item => {
+        setValue(item.urlData);
+      })
+    }
+  }, [currentAccount, currentChain, address])
 
   return (
     <Card sx={{}}>

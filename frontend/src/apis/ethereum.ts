@@ -10,17 +10,8 @@ const Web3 = require("web3");
 // const BN = require('bn.js');
 
 const { ethereum } = window;
-// ethereum.enable();
-// const rpcURL: string | undefined = process.env.REACT_APP_API_URL;
-// const web3 = new Web3(
-//   new Web3.providers.HttpProvider(
-//     rpcURL!!,
-//   )
-// );
 const web3 = new Web3(window.ethereum);
 
-// const contractRatingAddress = process.env.REACT_APP_CONTRACT_RATING
-// const contractRating = new web3.eth.Contract(abi_rating as AbiItem[], contractRatingAddress);
 const contractRatingFactoryAddress = process.env.REACT_APP_CONTRACT_RATING_FACTORY
 const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiItem[], contractRatingFactoryAddress);
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN

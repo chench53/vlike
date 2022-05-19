@@ -8,14 +8,11 @@ def add_items(rating_contract, *items):
     account = get_account()
     txs = []
     for i in items:
-        t= rating_contract.registerItem(i, {"from": account})
-        
-    # tx.wait(1)
-    # t = txs[-1]
-    # t.wait(1)
+        t = rating_contract.registerItem(i, {"from": account})
+        txs.append(t)
     if network.show_active() in LOCAL_BLOCKCHAIN:
         return {
-            'item_id': t.return_value
+            'items': [{'id': t.return_value} for t in txs]
         }
 
 def allow_request(token_contract, amount):

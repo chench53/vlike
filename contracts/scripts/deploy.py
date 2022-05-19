@@ -1,5 +1,6 @@
 import json
 import re
+from tokenize import Token
 
 from brownie import (
     Rating,
@@ -17,9 +18,20 @@ from .setup import add_items, allow_request
 
 default_deployment_config = {
     'allow': 1000000,
-    'items': [
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/lRba55HTK0Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-        '<blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">The bots are angry at being counted 🤣</p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/1525305145239781377?ref_src=twsrc%5Etfw">May 14, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'
+    'rating_contracts': [
+        {
+            'enable_token_at_init': False,
+            'items': [
+                '<iframe width="560" height="315" src="https://www.youtube.com/embed/lRba55HTK0Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+                '<blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">The bots are angry at being counted 🤣</p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/1525305145239781377?ref_src=twsrc%5Etfw">May 14, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'
+            ]
+        },
+        {
+            'enable_token_at_init': True,
+            'items': [
+                '<iframe id="reddit-embed" src="https://www.redditmedia.com/r/ProgrammerHumor/comments/us7av8/i_think_i_use_it_too_much/?ref_source=embed&amp;ref=share&amp;embed=true&amp;theme=dark" sandbox="allow-scripts allow-same-origin allow-popups" style="border: none;" scrolling="no" width="640" height="504"></iframe>'
+            ]
+        },
     ]
 }
 
@@ -31,7 +43,7 @@ def deplopy_contract(contact_container, *args):
     print("deployed {} contract at {}".format(contact_container._name, contract.address))
     return contract
 
-def deplopy_all(enable_token_at_init=False, dice=100):
+def _deplopy_all():
     account = get_account()
     token_contract = deplopy_contract(
         VlikeToken, 
@@ -40,62 +52,62 @@ def deplopy_all(enable_token_at_init=False, dice=100):
     rating_factory_contract = deplopy_contract(
         RatingFactory
     )
-    rating_factory_contract.createRatingSystemContract(
-        'dev',
-        token_contract, 
-        # pools_contract,
-        enable_token_at_init,
-        dice,
-        get_contract("vrf_coordinator").address,
-        get_contract("link_token").address,
-        config["networks"][network.show_active()]["fee"],
-        config["networks"][network.show_active()]["keyhash"],
-        {'from': account}
-    ).wait(1)
-    rating_contract = _get_rating(rating_factory_contract, account)
-    return token_contract, rating_factory_contract, rating_contract
+    return token_contract, rating_factory_contract
 
-def _get_rating(rating_factory_contract, user):
-    rating_contract_address = rating_factory_contract.UserAddressToContractAddress(user, 0)
+
+def _get_rating(rating_factory_contract, user, index=0):
+    rating_contract_address = rating_factory_contract.UserAddressToContractAddress(user, index)
     rating_contract = Contract.from_abi('rating', rating_contract_address, Rating.abi)
     return rating_contract
 
-def _setup(token_contract, rating_factory_contract, rating_contract):
+def _setup(token_contract, rating_factory_contract, default_deployment_config):
     account = get_account()
-    tx_link = fund_with_link(rating_contract.address)
     allow_request(token_contract, Web3.toWei(default_deployment_config['allow'], 'ether'))
-    for i in default_deployment_config['items']:
-        rating_contract.registerItem(i, {"from": account})
-    # add_items(default_deployment_config['items'])
+    for index, r in enumerate(default_deployment_config['rating_contracts']):
+        rating_factory_contract.createRatingSystemContract(
+            'dev',
+            token_contract, 
+            r['enable_token_at_init'],
+            100,
+            get_contract("vrf_coordinator").address,
+            get_contract("link_token").address,
+            config["networks"][network.show_active()]["fee"],
+            config["networks"][network.show_active()]["keyhash"],
+            {'from': account}
+        ).wait(1)
+        rating_contract = _get_rating(rating_factory_contract, account, index)
+        # for item in r['items']:
+        add_items(rating_contract, *r['items'])
+        if r['enable_token_at_init']:
+            fund_with_link(rating_contract.address) # link token trequired
 
-def _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract):
+def _write_frontend_end_env(token_contract, rating_factory_contract):
+    account = get_account()
     env_file_content_fmt = '''
 REACT_APP_API_URL={}
 REACT_APP_CHAIN_NETWORK={}
-REACT_APP_CONTRACT_RATING={}
 REACT_APP_CONTRACT_RATING_FACTORY={}
 REACT_APP_CONTRACT_VLIKE_TOKEN={}
+REACT_APP_ADMIN_ADDRESS={}
     '''
     if network.show_active() in LOCAL_BLOCKCHAIN:
         path = '../frontend/.env.development.local'
         env_file_content = env_file_content_fmt.format(
             'http://localhost:8545',
             'dev',
-            rating_contract.address, 
             rating_factory_contract.address, 
             token_contract.address,
-            # pools_contract.address,
-            )
+            account
+        )
     else:
         path = '../frontend/.env.production.local'
         env_file_content = env_file_content_fmt.format(
             '/chain',
             'rinkeby',
-            rating_contract.address, 
             rating_factory_contract.address, 
             token_contract.address,
-            # pools_contract.address,
-            )
+            account
+        )
     
     with open(path, 'w') as f:
         f.write(env_file_content)
@@ -116,7 +128,7 @@ def __sub_name(name):
     return re.sub('([a-z])?([A-Z])', lambda x: (x.group(1) and (x.group(1).lower() + '_') or '') + x.group(2).lower(), name)
 
 def main():
-    token_contract, rating_factory_contract, rating_contract = deplopy_all()
-    _setup(token_contract, rating_factory_contract, rating_contract)
-    _write_frontend_end_env(token_contract, rating_contract, rating_factory_contract)
-    _write_frontend_end_abi(token_contract, rating_contract, rating_factory_contract)
+    token_contract, rating_factory_contract = _deplopy_all()
+    _setup(token_contract, rating_factory_contract, default_deployment_config)
+    _write_frontend_end_env(token_contract, rating_factory_contract)
+    _write_frontend_end_abi(VlikeToken, Rating, RatingFactory)

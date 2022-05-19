@@ -9,6 +9,7 @@ import { getRatingCount, getUserRating, rate } from 'apis/ethereum';
 const { ethereum } = window;
 
 interface RatingOptionProps {
+  address: string,
   hasRated: boolean,
   myRating: number | undefined,
   giveRating: (arg0: number) => void,
@@ -18,11 +19,11 @@ interface RatingOptionProps {
 }
 
 function RatingOption(props: RatingOptionProps) {
-  const { hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon } = props;
+  const { address, hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon } = props;
   const Icon = icon;
   return (
     <Box>
-      <IconButton disabled={hasRated || !ethereum.selectedAddress} onClick={() => giveRating(ratingOptionValue)}>
+      <IconButton disabled={hasRated || !ethereum.selectedAddress || !address} onClick={() => giveRating(ratingOptionValue)}>
         <Icon color={myRating === ratingOptionValue ? 'primary' : undefined} />
       </IconButton>
       {ratingCount}
@@ -54,8 +55,10 @@ export default function Info(props: InfoProps) {
   ]
 
   useEffect(() => {
-    fetchCurrentRatingInfo()
-  }, [currentAccount, currentChain])
+    if (address) {
+      fetchCurrentRatingInfo()
+    }
+  }, [currentAccount, currentChain, address])
   
   function fetchCurrentRatingInfo() {
     getRatingCount(address, itemId).then(data => {
@@ -94,6 +97,7 @@ export default function Info(props: InfoProps) {
           ratingOptions.map(x => {
             return (
               <RatingOption
+                address={address}
                 key={x.value}
                 hasRated={hasRated} 
                 myRating={myRating} 

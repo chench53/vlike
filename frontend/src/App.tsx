@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Header from './components/header';
 import Footer from './components/footer';
-import Demo from './pages/demo';
+import Examples from './pages/examples';
 import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";
 import Item from "pages/item" ;
@@ -24,9 +24,9 @@ const theme = createTheme({
 
 const routes = [
   {
-    name: 'example',
-    path: 'example',
-    element: Demo
+    name: 'examples',
+    path: 'examples',
+    element: Examples
   },
   {
     name: 'devs',
@@ -133,7 +133,7 @@ function Main() {
               )
             })
           }
-          <Route path='*' key='home' element={<Navigate to="/example" replace />} />
+          <Route path='*' key='home' element={<Navigate to="/examples" replace />} />
         </Routes>
       </Box>
     )

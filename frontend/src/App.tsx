@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Header from './components/header';
 import Footer from './components/footer';
+import Info from './components/info';
 import Demo from './pages/demo';
 import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";

@@ -1,6 +1,8 @@
 import { useState, useContext, MouseEvent } from "react";
 import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box, Popover } from '@mui/material';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 import { connectWallet, etherContext } from 'apis/use_wallet';
 import { useTokenContext } from 'apis/hooks';
@@ -35,7 +37,15 @@ export default function Header(props: HeaderProps) {
         }}>
           <NavLink to="/" style={{textDecoration: 'none'}}>
             Vlike
-          </NavLink>
+        </NavLink>
+        <div className="headerdiv">
+            <input type="checkbox" className="checkbox" id="chk" />
+            <label className="label" htmlFor="chk">
+              <LightModeIcon className="licon"/>
+              <DarkModeIcon className="dicon"/>
+              <div className="ball"></div>
+            </label>
+          </div>
         <Box sx={{ flex: 1 }} />
 
         {

@@ -59,15 +59,19 @@
 
 /* dark mode */
 
-a {
+a.dark {
   color: #FFF;
 }
-a:hover {
-   color: rgb(108, 108, 116)
+a:hover.dark {
+  color: rgb(108, 108, 116)
 }
 
-
-
+a.light {
+  color: #000;
+}
+a:hover.light {
+  color: rgb(108, 108, 116)
+}
 
 
 /* toggle theme  */
@@ -87,7 +91,7 @@ a:hover {
   justify-content: space-between;
   padding: 5px;
   position: relative;
-  width: 50px;
+  width: 48px;
   height: 16px;
   transform: scale(1.25);
 }
@@ -119,17 +123,13 @@ a:hover {
 }
 
 .headerdiv {
-  margin-right: 24px;
+  margin-right: 48px;
 } 
 
-
-
-
-
-.devbox {
+/* .devbox {
   min-height: 100vh;
 }
 
 .faqbox {
   min-height: 100vh;
-}
+} */

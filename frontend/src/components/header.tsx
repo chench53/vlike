@@ -1,12 +1,12 @@
-import { useState, useContext, useMemo, MouseEvent } from "react";
+import { useState, useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { Toolbar, Button, Box, Popover } from '@mui/material';
+import { Toolbar, Button, Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
+import TokensButton from './tokens_btn';
 import { connectWallet, etherContext } from 'apis/use_wallet';
-import { useTokenContext } from 'apis/hooks';
-import { requestTokens } from 'apis/ethereum';
 
 interface HeaderProps { 
   handleSetTheme: (arg0: 'light' | 'dark') => void
@@ -15,8 +15,9 @@ interface HeaderProps {
 export default function Header(props: HeaderProps) {
 
   const { handleSetTheme } = props;
-
   const { currentAccount, setCurrentAccount } = useContext(etherContext);
+  const { palette } = useTheme()
+
 
   const NavTabs = [ 
     {
@@ -39,13 +40,15 @@ export default function Header(props: HeaderProps) {
         borderBottom: 1,
         borderColor: 'divider',
       }}>
-        <NavLink className='lightmode' to="/" style={{ textDecoration: 'none' }}>
-          Vlike
-        </NavLink>
+        <Typography variant="h5">
+          <NavLink className={palette.mode} to="/" style={{ textDecoration: 'none' }}>
+            Vlike
+          </NavLink>
+        </Typography>
 
         <Box sx={{ flex: 1 }} />
         <div className="headerdiv">
-          <input type="checkbox" className="checkbox" id="chk" onChange={e => {change()
+          <input type="checkbox" className="checkbox" id="chk" onChange={e => {
             handleSetTheme(e.target.checked ? 'light':'dark')
           }}/>
           <label className="label" htmlFor="chk">
@@ -58,16 +61,15 @@ export default function Header(props: HeaderProps) {
         {
           NavTabs.map(x => {
             return (
-              <Button key={x.name} sx={{
-                textTransform: 'none',
-                marginRight: 2,
+              <Typography variant="subtitle1" key={x.name} sx={{
+                marginRight: 4,
               }}>
-                <NavLink className='lightmode' to={x.to} style={() => ({
+                <NavLink className={palette.mode} to={x.to} style={(isActive) => ({
                   textDecoration: 'none',
-                    // color: isActive ? "gray" : "",
+                  // color: isActive ? "gray" : "",
                     // color: 'white'
                 })}>{x.name}</NavLink>
-              </Button>
+              </Typography>
             )
           })
           }
@@ -85,62 +87,4 @@ export default function Header(props: HeaderProps) {
       </Toolbar>
     </Box>
   );
-}
-
-function change() {
-  var get = document.querySelector('.lightmode');
-  get?.classList.toggle("black")
-}
-document.querySelector(".checkbox")?.addEventListener("toggle", change);
-
-
-function TokensButton() {
-  const { currentAccount, onRightChain } = useContext(etherContext);
-  const { balance, refreshToken } = useContext(useTokenContext);
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
-  return (
-    <Box sx={{ display: 'inline' }}>
-      <Button
-        variant='text'
-        color='success'
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
-        onClick={() => {
-          requestTokens().then(() => {
-            refreshToken && refreshToken();
-          })
-        }}
-        disabled={!(currentAccount && onRightChain)}
-        sx={{
-          marginRight: 1,
-          textTransform: 'none',
-        }}>Tokens: {balance}</Button>
-
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        sx={{
-          pointerEvents: 'none',
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
-      >Request 10 Vlike Tokens</Popover>
-    </Box>
-  )
 }

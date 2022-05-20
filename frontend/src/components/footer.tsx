@@ -1,4 +1,4 @@
-import { AppBar, IconButton, Box } from '@mui/material';
+import { IconButton, Box } from '@mui/material';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import GitHubIcon from '@mui/icons-material/GitHub';

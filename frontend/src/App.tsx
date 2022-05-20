@@ -98,7 +98,9 @@ function App() {
       <Box sx={{
         bgcolor: 'background.default',
         color: 'text.primary',
-        minHeight: '100vh',
+        minHeight: '108vh',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         <etherContext.Provider value={{
           currentAccount,
@@ -115,7 +117,7 @@ function App() {
             <Main />
           </useTokenContext.Provider>
         </etherContext.Provider>
-        <Footer />
+        <Footer/>
       </Box>
     </ThemeProvider>
   );
@@ -127,27 +129,29 @@ function Main() {
 
   const { onRightChain } = useContext(etherContext);
 
-  if (onRightChain === false) {
-    return (
-      <Alert severity="error">
-        plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
-      </Alert>
-    )
-  } else {
-    return (
-      <Box sx={{ marginTop: 1 }}>
-        <Routes>
-          {
-            routes.map(x => {
-              const Ele = x.element;
-              return (
-                <Route path={x.path} key={x.name} element={<Ele />} />
-              )
-            })
-          }
-          <Route path='*' key='home' element={<Navigate to="/examples" replace />} />
-        </Routes>
+  return (
+      <Box sx={{ marginTop: 1, flexGrow: 1 }}>
+        {
+          (onRightChain === false) ? (
+            <Alert severity="error" variant="filled" sx={{
+              width: 'max-content', 
+            }}>
+              plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
+            </Alert>
+          ) : (
+            <Routes>
+              {
+                routes.map(x => {
+                  const Ele = x.element;
+                  return (
+                    <Route path={x.path} key={x.name} element={<Ele />} />
+                  )
+                })
+              }
+              <Route path='*' key='home' element={<Navigate to="/examples" replace />} />
+            </Routes>
+          )
+        }
       </Box>
-    )
-  }
+  )
 }

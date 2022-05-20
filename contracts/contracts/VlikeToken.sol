@@ -14,12 +14,6 @@ contract VlikeToken is ERC20 {
         _mint(owner, initialSupply);
     }
 
-    // for debug
-    function setTag(string memory _tag) external returns (string memory) {
-        tag = _tag;
-        return tag;
-    }
-
     function requestTokens() external {
         this.transferFrom(owner, msg.sender, _ether(10));
     }

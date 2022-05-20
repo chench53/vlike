@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext  } from "react";
 
 import helperConfig from "./helper-config.json";
-// import etherConfig from "./ether-config.json";
+import { getNetworkName } from "./ethereum";
 
 const { ethereum } = window;
 
@@ -40,10 +40,11 @@ export const useWallet = () => {
     });
 
      ethereum.request({ method: 'net_version' }).then((chainId: string) => {
-      var chainName = helperConfig[chainId]
-      if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
-        chainName = 'dev'
-      }
+      // var chainName = helperConfig[chainId]
+      // if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
+      //   chainName = 'dev'
+      // }
+      const chainName = getNetworkName(chainId);
       console.log(`connect chainId: ${chainId}, chainName: ${chainName}`)
       SetCurrentChain(chainName);
       if (chainName) {

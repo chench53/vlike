@@ -69,9 +69,9 @@ def _setup(token_contract, rating_factory_contract, default_deployment_config):
             token_contract, 
             r['enable_token_at_init'],
             100,
+            5,
             get_contract("vrf_coordinator").address,
             get_contract("link_token").address,
-            config["networks"][network.show_active()]["fee"],
             config["networks"][network.show_active()]["keyhash"],
             {'from': account}
         ).wait(1)
@@ -121,6 +121,16 @@ def _write_frontend_end_abi(*contracts):
             json.dump(abi, f)
     print(f'wrote abi done')
 
+def _write_frontend_end_mock():
+    path = f'../frontend/src/apis/ether-config.json'
+    with open(path, 'r') as f:
+        ether_config = json.load(f)
+    ether_config['networks']['dev']['vrf_coordinator'] = get_contract("vrf_coordinator").address
+    ether_config['networks']['dev']['link_token'] = get_contract("link_token").address
+
+    with open(path, 'w') as f:
+        json.dump(ether_config, f, indent=2)
+
 def __sub_name(name):
     """
     RatingFactory ->rating_factory
@@ -132,3 +142,4 @@ def main():
     _setup(token_contract, rating_factory_contract, default_deployment_config)
     _write_frontend_end_env(token_contract, rating_factory_contract)
     _write_frontend_end_abi(VlikeToken, Rating, RatingFactory)
+    _write_frontend_end_mock()

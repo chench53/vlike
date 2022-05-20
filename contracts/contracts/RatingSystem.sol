@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-// pragma experimental ABIEncoderV2;
 
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./VlikeToken.sol";
 import "./Pools.sol";
@@ -15,21 +16,25 @@ contract Rating is VRFConsumerBase {
     VlikeToken public token;
     string public name;
     bool public tokenEnabled;
+    address public owner;
 
-    // lottery end
+    // lottery
     uint256 public dice;
+    uint256 public feeRatio;
     // chainlink
-    uint256 public fee;
+    LinkTokenInterface public linkToken;
+    uint256 public linkFee = 100000000000000000;
     bytes32 public keyhash;
 
     struct BaseInfo {
         string name;
         bool tokenEnabled;
+        uint256 balance;
+        uint256 linkTokenBanlance;
     }
 
     struct Item {
-        uint256 itemID; 
-        // bytes32 urlData;
+        uint256 itemID;
         string urlData;
         uint256 likeCount;
         uint256 dislikeCount;
@@ -37,7 +42,7 @@ contract Rating is VRFConsumerBase {
     }
 
     struct RatingByUser {
-        bool hasVoted;
+        bool hasRated;
         bool rating;
     }
 
@@ -74,32 +79,45 @@ contract Rating is VRFConsumerBase {
     constructor(
         string memory _name,
         VlikeToken _token,
-        // Pools _pools,
         bool enableTokenAtInit,
         uint256 _dice,
+        uint256 _feeRatio,
         address _vrfCoordinator, 
         address _link,
-        uint256 _fee,
-        bytes32 _keyhash
+        bytes32 _keyhash,
+        address _owner        
     ) VRFConsumerBase(_vrfCoordinator, _link) {
+        require(bytes(_name).length > 0, 'name can not be empty');
+        require(_dice > 1, 'dice shall larger than 1');
+        require(0<=_feeRatio && _feeRatio<=100, 'feeRatio shall be between 1 and 100');
         name = _name;
         dice = _dice;
+        feeRatio = _feeRatio;
         token = _token;
-        // pools = _pools;
-        fee = _fee;
+        linkToken = LinkTokenInterface(_link);
         keyhash = _keyhash;
+        owner = _owner;
         if (enableTokenAtInit == true) {
-            enableToken();
+            _enableToken();
         }
     }
 
-    function enableToken() public {
+    function enableToken() external onlyOwner {
+        _enableToken();
+    }
+
+    function _enableToken() internal {
         pools = new Pools(token);
         tokenEnabled = true;
     }
 
     function getBaseInfo() external view returns (BaseInfo memory baseInfo) {
-        return BaseInfo(name, tokenEnabled);
+        return BaseInfo(
+            name, 
+            tokenEnabled,
+            token.balanceOf(address(this)),
+            linkToken.balanceOf(address(this))
+        );
     }
 
     // consider only owner visibility. Do users register items that they want to rate
@@ -121,13 +139,13 @@ contract Rating is VRFConsumerBase {
     }
 
     function rate(uint256 _itemId, bool _score) public returns(bool success){
-        require(userRating[msg.sender][_itemId].hasVoted == false, 'Cannot vote twice!');
+        require(userRating[msg.sender][_itemId].hasRated == false, 'Cannot rate twice!');
 
         if (tokenEnabled == true) {
             stake(_itemId, _score);
         }
 
-        userRating[msg.sender][_itemId].hasVoted = true;
+        userRating[msg.sender][_itemId].hasRated = true;
         userRating[msg.sender][_itemId].rating = _score;
         // itemScores[_itemId].push(_score);
         itemMapping[_itemId].totalRatingCount += 1;
@@ -149,7 +167,7 @@ contract Rating is VRFConsumerBase {
 
         Pools.StakeInfo memory stakeInfo = Pools.StakeInfo(_itemId, msg.sender, _score, stakeAmount, voteWeight, 0);
         pools.stake(_itemId, _score, stakeInfo);
-        bytes32 requestId = requestRandomness(keyhash, fee);
+        bytes32 requestId = requestRandomness(keyhash, linkFee);
         randomRequestMapping[requestId] = stakeInfo;
 
         emit stakeEvent(_itemId, msg.sender, requestId);
@@ -170,6 +188,21 @@ contract Rating is VRFConsumerBase {
         _rating = userRating[_user][_itemId];
     }
 
+    function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
+        require(_randomness > 0, "random not found");
+        Pools.StakeInfo memory stakeInfo = randomRequestMapping[_requestId];
+        pools.vote(stakeInfo, _randomness);
+        if (checkDice(_randomness)) {
+            uint256 itemId = stakeInfo.itemId;
+            pools.reward(itemId, _randomness, feeRatio);
+        }
+    }
+
+    function checkDice(uint256 _randomness) internal view returns (bool) {
+        bool checked = _randomness % dice == 0;
+        return checked;
+    }
+
     function calculateRatingStake(uint256 _itemId) public view returns (uint256 stakeAmount, uint256 voteWeight) {
         uint256 index = itemMapping[_itemId].totalRatingCount + 1;
         return (_ether(1)/index, index);
@@ -179,24 +212,9 @@ contract Rating is VRFConsumerBase {
     function _ether(uint256 amountInEther) internal pure returns (uint256 amountInWei) {
         return amountInEther * 10 **18;
     }
-    // for debug
-    function debug(uint256 index) public pure returns (uint256) {
-        return _ether(1)/index;
-    }
 
-    function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
-        require(_randomness > 0, "random not found");
-        Pools.StakeInfo memory stakeInfo = randomRequestMapping[_requestId];
-        pools.vote(stakeInfo, _randomness);
-        if (checkDice(_randomness)) {
-            uint256 itemId = stakeInfo.itemId;
-            pools.reward(itemId, _randomness);
-            // pools.resetPool(itemId);
-        }
-    }
-
-    function checkDice(uint256 _randomness) internal view returns (bool) {
-        bool checked = _randomness % dice == 0;
-        return checked;
+    modifier onlyOwner {
+        require(msg.sender == owner, "you are not owner");
+        _;
     }
 }

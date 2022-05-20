@@ -17,13 +17,24 @@ const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiIte
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
 const contractVlikeToke = new web3.eth.Contract(abi_vlike_token as AbiItem[], contractVlikeTokenAddress);
 
+export const getNetworkName = (chainId: string) => {
+  var chainName = helperConfig[chainId]
+  console.log(chainId)
+  if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
+    chainName = 'dev'
+  }
+  console.log(chainName)
+  return chainName
+}
+
 export const getEtherConfig = async () => {
   const chainId: string = await web3.eth.getChainId();
-  const networkName =  helperConfig[chainId]
-  
-  const vrfCoordinator = etherConfig['networks'][networkName]['vrf_coordinator']
-  const linkToken = etherConfig['networks'][networkName]['link_token']
-  const keyhash = etherConfig['networks'][networkName]['keyhash']
+
+  const networkName =  getNetworkName(chainId)
+  console.log(networkName)
+  const vrfCoordinator: string = etherConfig['networks'][networkName]['vrf_coordinator']
+  const linkToken: string = etherConfig['networks'][networkName]['link_token']
+  const keyhash: string = etherConfig['networks'][networkName]['keyhash']
 
   return {
     vrfCoordinator,
@@ -56,10 +67,18 @@ export const getRatingContract = async (user: string, index: number) => {
 
 export const getRatingContractBaseInfo = async (address: string) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], address);
-  const _baseInfo = await MyContractRating.methods.getBaseInfo().call();
-  return {
-    name: _baseInfo[0],
-    tokenEnabled: _baseInfo[1]
+  try {
+    const _baseInfo = await MyContractRating.methods.getBaseInfo().call();
+    return {
+      name: _baseInfo[0],
+      tokenEnabled: _baseInfo[1]
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      name: '',
+      tokenEnabled: false
+    }
   }
 }
 
@@ -80,9 +99,9 @@ export const createRating = async (name: string, enableTokenAtInit: boolean) => 
       contractVlikeTokenAddress,
       enableTokenAtInit, 
       100, 
+      5,
       vrfCoordinator, 
       linkToken,
-      1000000, // bignumber issue
       keyhash
   ).send({from: ethereum.selectedAddress})
 }

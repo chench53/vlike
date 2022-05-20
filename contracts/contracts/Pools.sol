@@ -29,7 +29,8 @@ contract Pools {
     event rewardEvent(
         uint256 itemId,
         address winner,
-        uint256 rewardAmount
+        uint256 rewardAmount,
+        uint256 feeAmount
     );
 
     constructor (
@@ -51,7 +52,11 @@ contract Pools {
         emit voteEvent(stakeInfo.itemId, stakeInfo.rater, selectedIndex);
     }
 
-    function reward(uint256 _itemid, uint256 _randomness) external onlyOwner returns (address, uint256, uint256) {
+    function reward(
+        uint256 _itemid, 
+        uint256 _randomness, 
+        uint256 _feeRatio
+    ) external onlyOwner returns (address, uint256, uint256) {
         uint256 rewardAmount;
         uint256 totalVotes;
         for (uint256 i=0; i < itemPoolMapping[_itemid][false].length; i++) {
@@ -65,10 +70,13 @@ contract Pools {
 
         uint256 cursor = _randomness % totalVotes; 
         address winner = _findWinner(_itemid, cursor);
+        uint256 feeAmount = rewardAmount * _feeRatio / 100;
+        rewardAmount -= feeAmount;
+        token.transfer(owner, feeAmount);
         token.transfer(winner, rewardAmount);
         resetPool(_itemid);
 
-        emit rewardEvent(_itemid, winner, rewardAmount);
+        emit rewardEvent(_itemid, winner, rewardAmount, feeAmount);
 
         return (winner, rewardAmount, totalVotes);
     }

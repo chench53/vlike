@@ -67,6 +67,7 @@ export default function Devs() {
   const getRow = async (i: number) => {
     const ratingContract = await getRatingContract(currentAccount || '', i); 
     const baseInfo = await getRatingContractBaseInfo(ratingContract);
+
     let row = {
       address: ratingContract,
       name: baseInfo.name,

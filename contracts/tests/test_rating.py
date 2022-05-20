@@ -2,7 +2,7 @@
 run tests:
     brownie test tests/test_rating.py -s
 run a test function:
-    brownie test tests/test_rating.py -k test_rating -s
+    brownie test tests/test_rating.py -k test_rating_no_tokens -s
     brownie test tests/test_rating.py -k test_rating_with_tokens -s
 """
 
@@ -16,6 +16,7 @@ from brownie import (
     network,
     config,
 )
+from eth_account import Account
 import pytest
 from web3 import constants, Web3
 
@@ -47,26 +48,44 @@ class TestRating():
     def teardown_class(self):
         print('teardown')
 
-    def test_rating(self):
+    def test_rating_no_tokens(self):
+        account = get_account()
         user1 = get_account(1)
     
         name = 'unittest'
-        rating_contract = deplopy_contract(
-            Rating,
+        # rating_contract = deplopy_contract(
+        #     Rating,
+        #     name,
+        #     token_contract,
+        #     False,
+        #     100,
+        #     5,
+        #     get_contract("vrf_coordinator").address,
+        #     get_contract("link_token").address,
+        #     config["networks"][network.show_active()]["keyhash"],
+        #     get_account()
+        # )
+
+        rating_factory_contract.createRatingSystemContract(
             name,
-            constants.ADDRESS_ZERO,
+            token_contract,
             False,
             100,
-            constants.ADDRESS_ZERO,
-            constants.ADDRESS_ZERO,
-            config["networks"][network.show_active()]["fee"],
+            5,
+            get_contract("vrf_coordinator").address,
+            get_contract("link_token").address,
             config["networks"][network.show_active()]["keyhash"],
-        )
+        ).wait(1)
+
+        rating_contract = _get_rating(rating_factory_contract, account, 0)
+
         items = add_items(rating_contract, "abc", "xyz")['items']
-        print(items)
+        # print(items)
+        assert len(items) == 2
         itemId = items[0]['id']
 
-
+        base_info = rating_contract.getBaseInfo()
+        print(base_info)
         # rating info on (hasVoted, rating)
         ratingInfo = rating_contract.getUserRating(itemId, {"from": user1})
         assert ratingInfo == (False, False)
@@ -89,15 +108,14 @@ class TestRating():
         user1 = get_account(1)
         user2 = get_account(2)
 
-        # token_contract, _, rating_contract = _deplopy_all(True)
         rating_factory_contract.createRatingSystemContract(
             'dev',
             token_contract, 
             True,
             100,
+            5,
             get_contract("vrf_coordinator").address,
             get_contract("link_token").address,
-            config["networks"][network.show_active()]["fee"],
             config["networks"][network.show_active()]["keyhash"],
             {'from': account}
         ).wait(1)
@@ -108,6 +126,9 @@ class TestRating():
         pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
         itemId = add_items(rating_contract, "abc")['items'][0]['id']
         fund_with_link(rating_contract.address)
+        # print(rating_contract.getBaseInfo())
+        base_info = rating_contract.getBaseInfo()
+        assert base_info[3] == Web3.toWei(10, 'ether') # linktoken
 
         stake_amount, vote_weight = rating_contract.calculateRatingStake(itemId)
         token_contract.approve(rating_contract, stake_amount, {'from': user1})
@@ -142,7 +163,7 @@ class TestRating():
         tx_vrf = get_contract("vrf_coordinator").callBackWithRandomness(
             request_id, STATIC_RNG, rating_contract.address, {"from": account}
         )
-        assert tx_vrf.events["rewardEvent"]['rewardAmount'] == stake_amount + stake_amount2
+        assert tx_vrf.events["rewardEvent"]['rewardAmount'] == (stake_amount + stake_amount2) * 0.95
         # breakpoint()
         with pytest.raises(exceptions.VirtualMachineError): # pool is reset
             pools_contract.itemPoolMapping(itemId, rating, 0)

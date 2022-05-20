@@ -18,24 +18,23 @@ contract RatingFactory {
     function createRatingSystemContract(
         string memory name,
         VlikeToken token,
-        // Pools _pools,
         bool enableTokenAtInit,
         uint256 dice,
+        uint256 feeRatio,
         address vrfCoordinator,
         address link,
-        uint256 fee,
         bytes32 keyhash
     ) public returns(Rating tokenAddress){
         Rating ratingContract = new Rating(
             name,
             token,
-            // _pools,
             enableTokenAtInit,
             dice,
+            feeRatio,
             vrfCoordinator,
             link,
-            fee,
-            keyhash
+            keyhash,
+            msg.sender
         );
         UserAddressToContractAddress[msg.sender].push(address(ratingContract));
 

@@ -27,11 +27,12 @@ interface tableRow {
   name: string,
   tokenEnabled: boolean,
   balance: number,
+  linkTokenBanlance: number,
 }
 
 export default function Devs() {
 
-  const { currentAccount, currentChain, onRightChain } = useContext(etherContext);
+  const { currentAccount, onRightChain } = useContext(etherContext);
   const [ rows, setRows ] = useState<tableRow[]>([])
   const [ open, setOpen ] = useState(false);
   const [ dataFetched, setDataFetched ] = useState(true);
@@ -40,11 +41,10 @@ export default function Devs() {
     if (currentAccount && onRightChain) {
       handleGetRatingContract();
     }
-  }, [currentAccount, currentChain])
+  }, [currentAccount, onRightChain ])
 
   const handleClose = (tx: string|null) => {
     setOpen(false);
-    // setSelectedValue(value);
     if (tx) {
       handleGetRatingContract().then(() => {});
     }
@@ -72,7 +72,8 @@ export default function Devs() {
       address: ratingContract,
       name: baseInfo.name,
       tokenEnabled: baseInfo.tokenEnabled,
-      balance: 0,
+      balance: baseInfo.balance,
+      linkTokenBanlance: baseInfo.linkTokenBanlance
     } as tableRow
     return row;
   }
@@ -114,13 +115,13 @@ interface RatingsTableProps {
   rows: tableRow[]
 }
 
-export function RatingsTable(props: RatingsTableProps) {
+function RatingsTable(props: RatingsTableProps) {
 
   const { dataFetched, rows } = props;
 
   return (
     <TableContainer component={Paper}>
-      { dataFetched || <LinearProgress sx={{ width: '100%'}}/>}
+      { dataFetched ? '' : <LinearProgress sx={{ width: '100%'}}/> }
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -128,6 +129,7 @@ export function RatingsTable(props: RatingsTableProps) {
             <TableCell >Name</TableCell>
             <TableCell >Token enabled</TableCell>
             <TableCell >Balance</TableCell>
+            <TableCell >Link Balance</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -136,16 +138,14 @@ export function RatingsTable(props: RatingsTableProps) {
               key={row.address}
               component={Link} to={`/dashboard/${row.address}/`}
               sx={{ 
-                '&:last-child td, &:last-child th': { border: 0 },
                 textDecoration: 'none'
               }}
-            >
-              <TableCell component="th" scope="row">
-                {row.address}
-              </TableCell>
+              >
+              <TableCell>{row.address}</TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.tokenEnabled.toString()}</TableCell>
               <TableCell align="right">{row.balance}</TableCell>
+              <TableCell align="right">{row.linkTokenBanlance}</TableCell>
             </TableRow>
           ))}
         </TableBody>

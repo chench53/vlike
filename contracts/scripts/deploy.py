@@ -130,6 +130,7 @@ def _write_frontend_end_mock():
 
     with open(path, 'w') as f:
         json.dump(ether_config, f, indent=2)
+    print(f'wrote mock done')
 
 def __sub_name(name):
     """

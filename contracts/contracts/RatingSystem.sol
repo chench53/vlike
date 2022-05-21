@@ -31,6 +31,7 @@ contract Rating is VRFConsumerBase {
         bool tokenEnabled;
         uint256 balance;
         uint256 linkTokenBanlance;
+        address owner;
     }
 
     struct Item {
@@ -107,6 +108,7 @@ contract Rating is VRFConsumerBase {
     }
 
     function _enableToken() internal {
+        require(tokenEnabled == false, 'token already enabled');
         pools = new Pools(token);
         tokenEnabled = true;
     }
@@ -116,7 +118,8 @@ contract Rating is VRFConsumerBase {
             name, 
             tokenEnabled,
             token.balanceOf(address(this)),
-            linkToken.balanceOf(address(this))
+            linkToken.balanceOf(address(this)),
+            owner,
         );
     }
 

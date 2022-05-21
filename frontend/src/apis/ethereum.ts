@@ -7,7 +7,6 @@ import abi_rating_factory from './abi/rating_factory.json';
 import abi_vlike_token from './abi/vlike_token.json';
 
 const Web3 = require("web3");
-// const BN = require('bn.js');
 
 const { ethereum } = window;
 const web3 = new Web3(window.ethereum);
@@ -17,21 +16,24 @@ const contractRatingFactory = new web3.eth.Contract(abi_rating_factory as AbiIte
 const contractVlikeTokenAddress = process.env.REACT_APP_CONTRACT_VLIKE_TOKEN
 const contractVlikeToke = new web3.eth.Contract(abi_vlike_token as AbiItem[], contractVlikeTokenAddress);
 
+export interface ContractBaseInfo {
+  name: string,
+  tokenEnabled: boolean,
+  balance: number,
+  linkTokenBanlance: number,
+}
+
 export const getNetworkName = (chainId: string) => {
   var chainName = helperConfig[chainId]
-  console.log(chainId)
   if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
     chainName = 'dev'
   }
-  console.log(chainName)
   return chainName
 }
 
 export const getEtherConfig = async () => {
   const chainId: string = await web3.eth.getChainId();
-
   const networkName =  getNetworkName(chainId)
-  console.log(networkName)
   const vrfCoordinator: string = etherConfig['networks'][networkName]['vrf_coordinator']
   const linkToken: string = etherConfig['networks'][networkName]['link_token']
   const keyhash: string = etherConfig['networks'][networkName]['keyhash']
@@ -71,14 +73,18 @@ export const getRatingContractBaseInfo = async (address: string) => {
     const _baseInfo = await MyContractRating.methods.getBaseInfo().call();
     return {
       name: _baseInfo[0],
-      tokenEnabled: _baseInfo[1]
-    }
+      tokenEnabled: _baseInfo[1],
+      balance: _baseInfo[2],
+      linkTokenBanlance: _baseInfo[3]
+    } as ContractBaseInfo
   } catch (e) {
     console.error(e)
     return {
       name: '',
-      tokenEnabled: false
-    }
+      tokenEnabled: false,
+      balance: 0,
+      linkTokenBanlance: 0
+    } as ContractBaseInfo
   }
 }
 
@@ -93,7 +99,6 @@ export const rate = async (ratingContractAddress: string, itemId: number, rating
 
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();
-  // console.log(ethereum.selectedAddress)
   return await contractRatingFactory.methods.createRatingSystemContract(
       name,
       contractVlikeTokenAddress,
@@ -126,4 +131,9 @@ export const getTokenBalance = async () => {
 
 export const requestTokens = async () => {
   return await contractVlikeToke.methods.requestTokens().send({from: ethereum.selectedAddress});
+}
+
+export const ratingEnableToken = async (ratingContractAddress: string) => {
+  const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
+  return await MyContractRating.methods.enableToken().send({from: ethereum.selectedAddress})
 }

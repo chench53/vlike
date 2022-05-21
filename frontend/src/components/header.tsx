@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Toolbar, Button, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -17,7 +17,6 @@ export default function Header(props: HeaderProps) {
   const { handleSetTheme } = props;
   const { currentAccount, setCurrentAccount } = useContext(etherContext);
   const { palette } = useTheme()
-
 
   const NavTabs = [ 
     {

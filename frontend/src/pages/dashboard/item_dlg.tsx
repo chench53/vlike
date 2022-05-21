@@ -73,7 +73,7 @@ function ItemForm(props: ItemFormProps) {
   }
 
   function checkValueValid(value: string) {
-    return /<\/?[a-z][\s\S]*>/i.test(value);
+    return /^<\/?[a-z][\s\S]*>$/i.test(value);
   }
   
   async function submit() {

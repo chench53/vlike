@@ -1,5 +1,5 @@
 import { useState, useContext, MouseEvent } from "react";
-import { Button, Box, Popover, Menu, MenuItem } from '@mui/material';
+import { Button, Box, Popover } from '@mui/material';
 
 import { etherContext } from 'apis/use_wallet';
 import { useTokenContext } from 'apis/hooks';

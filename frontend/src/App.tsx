@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, Alert } from '@mui/material';
-import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Header from './components/header';
 import Footer from './components/footer';

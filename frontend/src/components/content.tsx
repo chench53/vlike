@@ -27,7 +27,7 @@ export default function Content(props: ContentProps) {
         setValue(item.urlData);
       })
     }
-  }, [currentAccount, currentChain, address])
+  }, [currentAccount, currentChain, address, id])
 
   return (
     <Card sx={{}}>

@@ -39,22 +39,23 @@ export default function Items(props: ItemsProps) {
   const [ dataFetched, setDataFetched ] = useState(true);
   const [ open, setOpen ] = useState(false);
   const [ rows, setRows ] = useState<tableRow[]>([])
+  const [ refreshKey, setRefreshKey ] = useState(0); // bad idea
 
   useEffect(() => {
-    if (contractAddress) {
+    const handleGetRatingContract = async () => {
+      setDataFetched(false);
+      const count = await getItemsCount(contractAddress);
+      // @ts-ignore
+      const arr = [...Array(5).keys()].map(i => count-1-i).filter(i=>i>=0); // only last 5 items. 
+      const rows = await Promise.all(arr.map(i => getRow(contractAddress, i)))
+      setRows(rows);
+      setDataFetched(true);
+    }
+    if (contractAddress && !open) {
       handleGetRatingContract();
     }
-  }, [contractAddress])
+  }, [contractAddress, open, refreshKey])
 
-  const handleGetRatingContract = async () => {
-    setDataFetched(false);
-    const count = await getItemsCount(contractAddress);
-    // @ts-ignore
-    const arr = [...Array(5).keys()].map(i => count-1-i).filter(i=>i>=0); // only last 5 items. 
-    const rows = await Promise.all(arr.map(i => getRow(contractAddress, i)))
-    setRows(rows);
-    setDataFetched(true);
-  }
 
   const getRow = async (contractAddress: string, i: number) => {
     const item = await getItem(contractAddress, i);
@@ -70,9 +71,9 @@ export default function Items(props: ItemsProps) {
 
   const handleDlgClose = (tx: string|null) => {
     setOpen(false);
-    if (tx) {
-      handleGetRatingContract().then(() => {});
-    }
+    // if (tx) {
+    //   handleGetRatingContract().then(() => {});
+    // }
   };
 
   return (
@@ -91,7 +92,7 @@ export default function Items(props: ItemsProps) {
         >
           Items
         </Typography>
-          <IconButton>
+          <IconButton  disabled={!contractAddress} onClick={() => setRefreshKey(oldKey => oldKey +1)}>
             <Refresh></Refresh>
           </IconButton>
         <Button variant='contained' sx={{whiteSpace:'nowrap'}} onClick={() => {setOpen(true)}}>Add Item</Button>
@@ -120,19 +121,19 @@ function ItemsTable(props: TableProps) {
     var htmlDoc = parser.parseFromString(value, 'text/html');
     var tag = htmlDoc.body.firstElementChild?.nodeName;
     if (tag) {
-      tag = `<${tag.toLowerCase()}...`
+      tag = `<${tag.toLowerCase()}>...`
     }
     return tag;
   }
 
   return (
     <TableContainer component={Paper}>
-      { dataFetched || <LinearProgress sx={{ width: '100%'}}/>}
+      { dataFetched ? '' : <LinearProgress sx={{ width: '100%'}}/> }
       <Table sx={{ minWidth: 'md' }} >
         <TableHead>
           <TableRow>
             <TableCell style={{ width: 40 }}>id</TableCell>
-            <TableCell style={{ width: 160 }}>value</TableCell>
+            <TableCell style={{ }}>value</TableCell>
             <TableCell style={{ width: 80 }} align="right">like</TableCell>
             <TableCell style={{ width: 80 }} align="right">dislike</TableCell>
           </TableRow>
@@ -146,19 +147,22 @@ function ItemsTable(props: TableProps) {
                 textDecoration: 'none'
               }}
             >
-              <TableCell component="th" scope="row">
+              <TableCell>
                 {row.id}
               </TableCell>
               <TableCell sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                // whiteSpace: "nowrap"
               }}>
                 {/* <Button> */}
                 <Tooltip title={row.value}>
-                  <span>
+                  <Typography sx={{
+                    width: 'calc(100%*0.20)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: "nowrap"
+                  }}>
                     {shortValue(row.value)}
-                  </span>
+
+                  </Typography>
                 </Tooltip>
                 {/* </Button> */}
               </TableCell>

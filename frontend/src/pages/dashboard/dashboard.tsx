@@ -1,32 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import {
+  Alert,
   Box,
   Button,
   Container,
+  Typography,
 } from '@mui/material';
 
 import Items from './items';
 import { ratingContractContext } from 'apis/hooks';
-import { ContractBaseInfo, getRatingContractBaseInfo, ratingEnableToken } from 'apis/ethereum';
+import { 
+  ContractBaseInfo, 
+  getDefalutContractBaseInfo,
+  getRatingContractBaseInfo, 
+  ratingEnableToken 
+} from 'apis/ethereum';
+import { etherContext } from 'apis/use_wallet';
 
 export default function Dashboard() {
 
   const { contractAddress } = useParams();
-  const [ baseInfo, setBaseInfo ] = useState<ContractBaseInfo>({
-    name: '',
-    tokenEnabled: false,
-    balance: 0,
-    linkTokenBanlance: 0
-  })
+  const { currentAccount } = useContext(etherContext);
+  const [ baseInfo, setBaseInfo ] = useState<ContractBaseInfo>(getDefalutContractBaseInfo())
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress && currentAccount) {
       getRatingContractBaseInfo(contractAddress||'').then(data => {
         setBaseInfo(data);
       })
     }
-  }, [contractAddress])
+  }, [contractAddress, currentAccount])
 
   function enableToken() {
     if(contractAddress) {
@@ -41,23 +45,43 @@ export default function Dashboard() {
   return (
     <ratingContractContext.Provider value={{contractAddress: contractAddress || ''}}>
       <Box sx={{marginTop: 2}}>
+        {
+          (baseInfo.owner && baseInfo.owner !== currentAccount) ? (
+            <Alert severity="error" variant="filled" sx={{
+                width: 'max-content', 
+                position: 'absolute'
+              }}>
+                You are not the owner of this contract.
+              </Alert>
+          ) : ''
+        }
         <Container maxWidth="md">
-          <Box sx={{marginBottom: 2}}>
-            address: {contractAddress} <br/>
-            name: {baseInfo.name} <br/>
-            token enabled: {baseInfo.tokenEnabled.toString()}<br/>
-            balance: {baseInfo.balance} <br/>
-            Link token banlance: {baseInfo.linkTokenBanlance} <br/>
+          <Box sx={{
+            marginBottom: 2, 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            alignItems: 'baseline'
+          }}>
+            <Typography>
+              address: {contractAddress} <br/>
+              name: {baseInfo.name} <br/>
+              token enabled: {baseInfo.tokenEnabled.toString()}<br/>
+              balance: {baseInfo.balance} <br/>
+              Link token banlance: {baseInfo.linkTokenBanlance} <br/>
+            </Typography>
             {
-              (contractAddress && !baseInfo.tokenEnabled)?(
-                <Button variant="contained" color="warning" onClick={enableToken} sx={{
-                  marginTop: 2
-                }}>Enable Token</Button>
+              (contractAddress && !baseInfo.tokenEnabled && baseInfo.owner)?(
+                <Button 
+                  variant="contained" 
+                  color="warning" 
+                  disabled={baseInfo.owner !== currentAccount}
+                  onClick={enableToken}
+                >Enable Token</Button>
               ):''
             }
           </Box>
           {
-            contractAddress?<Items/>:''
+            (contractAddress && baseInfo.owner === currentAccount)?<Items/>:''
           }
         </Container>
       </Box>

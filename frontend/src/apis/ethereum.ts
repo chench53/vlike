@@ -21,6 +21,17 @@ export interface ContractBaseInfo {
   tokenEnabled: boolean,
   balance: number,
   linkTokenBanlance: number,
+  owner: string,
+}
+
+export const getDefalutContractBaseInfo = () => {
+  return {
+    name: '',
+    tokenEnabled: false,
+    balance: 0,
+    linkTokenBanlance: 0,
+    owner: ''
+  } as ContractBaseInfo
 }
 
 export const getNetworkName = (chainId: string) => {
@@ -29,6 +40,10 @@ export const getNetworkName = (chainId: string) => {
     chainName = 'dev'
   }
   return chainName
+}
+// address case insensitive
+export const toChecksumAddress = (address: string) => {
+  return web3.utils.toChecksumAddress(address)
 }
 
 export const getEtherConfig = async () => {
@@ -75,16 +90,12 @@ export const getRatingContractBaseInfo = async (address: string) => {
       name: _baseInfo[0],
       tokenEnabled: _baseInfo[1],
       balance: _baseInfo[2],
-      linkTokenBanlance: _baseInfo[3]
+      linkTokenBanlance: _baseInfo[3],
+      owner: toChecksumAddress(_baseInfo[4])
     } as ContractBaseInfo
   } catch (e) {
     console.error(e)
-    return {
-      name: '',
-      tokenEnabled: false,
-      balance: 0,
-      linkTokenBanlance: 0
-    } as ContractBaseInfo
+    return getDefalutContractBaseInfo()
   }
 }
 

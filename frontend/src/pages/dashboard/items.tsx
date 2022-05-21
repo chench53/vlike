@@ -34,6 +34,7 @@ interface ItemsProps {
 
 export default function Items(props: ItemsProps) {
 
+
   const { contractAddress } = useContext(ratingContractContext);
 
   const [ dataFetched, setDataFetched ] = useState(true);
@@ -71,9 +72,6 @@ export default function Items(props: ItemsProps) {
 
   const handleDlgClose = (tx: string|null) => {
     setOpen(false);
-    // if (tx) {
-    //   handleGetRatingContract().then(() => {});
-    // }
   };
 
   return (

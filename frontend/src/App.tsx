@@ -136,7 +136,7 @@ function Main() {
             <Alert severity="error" variant="filled" sx={{
               width: 'max-content', 
             }}>
-              plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}
+              Plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}.
             </Alert>
           ) : (
             <Routes>

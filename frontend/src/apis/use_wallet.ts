@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext  } from "react";
 
 import helperConfig from "./helper-config.json";
-import { getNetworkName } from "./ethereum";
+import { getNetworkName, toChecksumAddress } from "./ethereum";
 
 const { ethereum } = window;
 
@@ -29,7 +29,7 @@ export const useWallet = () => {
     // @ts-ignore
     ethereum.on("accountsChanged", ([newAccount]) => {
       console.log("accountsChanged: ", newAccount);
-      setCurrentAccount(newAccount);
+      setCurrentAccount(toChecksumAddress(newAccount));
     })
     // @ts-ignore
     ethereum.on('chainChanged', (chainId) => {

@@ -119,7 +119,7 @@ contract Rating is VRFConsumerBase {
             tokenEnabled,
             token.balanceOf(address(this)),
             linkToken.balanceOf(address(this)),
-            owner,
+            owner
         );
     }
 

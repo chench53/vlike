@@ -40,10 +40,6 @@ export const useWallet = () => {
     });
 
      ethereum.request({ method: 'net_version' }).then((chainId: string) => {
-      // var chainName = helperConfig[chainId]
-      // if (!chainName && (parseInt(chainId) > 1652600000000)) { // local chainid timestamp
-      //   chainName = 'dev'
-      // }
       const chainName = getNetworkName(chainId);
       console.log(`connect chainId: ${chainId}, chainName: ${chainName}`)
       SetCurrentChain(chainName);

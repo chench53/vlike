@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import Header from './components/header';
 import Footer from './components/footer';
+import Msg from './components/msg';
 import Examples from './pages/examples';
 import Devs from './pages/devs/devs';
 import Dashboard from "pages/dashboard/dashboard";
@@ -13,7 +14,7 @@ import Faq from './pages/faq';
 import './App.css';
 
 import { useWallet, etherContext } from './apis/use_wallet';
-import { useTokenContext } from './apis/hooks';
+import { useTokenContext, msgContext, useMsg } from './apis/hooks';
 import { getTokenBalance } from './apis/ethereum';
 
 
@@ -117,7 +118,7 @@ function App() {
             <Main />
           </useTokenContext.Provider>
         </etherContext.Provider>
-        <Footer/>
+        <Footer />
       </Box>
     </ThemeProvider>
   );
@@ -128,13 +129,28 @@ export default App;
 function Main() {
 
   const { onRightChain } = useContext(etherContext);
+  // const { show } = useContext(msgContext)
+  const  {
+    open,
+    text,
+    type,
+    show,
+    close,
+  } = useMsg()
 
   return (
+    <msgContext.Provider value={{
+      open,
+      text,
+      type,
+      show,
+      close,
+    }}>
       <Box sx={{ marginTop: 1, flexGrow: 1 }}>
         {
           (onRightChain === false) ? (
             <Alert severity="error" variant="filled" sx={{
-              width: 'max-content', 
+              width: 'max-content',
             }}>
               Plasse connect to network {process.env.REACT_APP_CHAIN_NETWORK}.
             </Alert>
@@ -152,6 +168,9 @@ function Main() {
             </Routes>
           )
         }
+        <Msg open={open} text={text} type={type} close={close}></Msg>
+
       </Box>
+    </msgContext.Provider>
   )
 }

@@ -4,7 +4,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 import { etherContext } from 'apis/use_wallet';
-import { useTokenContext } from 'apis/hooks';
+import { useTokenContext, msgContext } from 'apis/hooks';
 import { getRatingCount, getUserRating, rate } from 'apis/ethereum';
 
 const { ethereum } = window;
@@ -38,12 +38,14 @@ interface InfoProps {
 }
 
 export default function Info(props: InfoProps) {
+
   const { address, itemId } = props;
   const [ hasRated, setHasRated ] = useState(false);
   const [ myRating, setMyRating ] = useState<number | undefined>(undefined);
   const [ ratingCount, setRatingCount ] = useState([0, 0])
   const { currentAccount, currentChain } = useContext(etherContext);
   const { refreshToken } = useContext(useTokenContext);
+  const { show, text, open } = useContext(msgContext)
 
   const ratingOptions = [
     {
@@ -80,6 +82,11 @@ export default function Info(props: InfoProps) {
   function giveRating(score: number) {
     rate(address, itemId, score).then(() => {
       fetchCurrentRatingInfo()
+    }, e => {
+      console.error(e)
+      if (e==='TokensInsufficient') {
+        show('Insufficient vlike tokens', 'error')
+      }
     })
   }
 
@@ -92,6 +99,7 @@ export default function Info(props: InfoProps) {
       paddingLeft: 2,
       paddingRight: 2,
     }}>
+
       <Typography variant='subtitle1'>
       id: {itemId}
       </Typography>

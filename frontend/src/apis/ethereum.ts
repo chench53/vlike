@@ -103,10 +103,24 @@ export const rate = async (ratingContractAddress: string, itemId: number, rating
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
   const tokenEnabled = await MyContractRating.methods.tokenEnabled().call()
   if (tokenEnabled) {
-    await contractVlikeToke.methods.approve(ratingContractAddress, Web3.utils.toWei('100', 'ether')).send({from: ethereum.selectedAddress})
+    const [stake, myBanlance] = await Promise.all([
+      MyContractRating.methods.calculateRatingStake(itemId).call(),
+      contractVlikeToke.methods.balanceOf(ethereum.selectedAddress).call()
+    ])
+    console.log(stake.stakeAmount)
+    console.log(myBanlance)
+    console.log( Web3.utils.toWei(myBanlance, 'wei') >=  Web3.utils.toWei(stake.stakeAmount, 'wei') )
+    if (Web3.utils.toWei(myBanlance, 'wei') <  Web3.utils.toWei(stake.stakeAmount, 'wei') ) {
+      throw 'TokensInsufficient'
+    }
+    await contractVlikeToke.methods.approve(ratingContractAddress, myBanlance).send({from: ethereum.selectedAddress})
   }
   return await MyContractRating.methods.rate(itemId, !!rating).send({from: ethereum.selectedAddress})
 }
+
+// export const computeRatingCost = async (MyContractRating: web3.eth.Contract, itemId: number) => {
+
+// }
 
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();

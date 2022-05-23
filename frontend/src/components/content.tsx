@@ -30,7 +30,7 @@ export default function Content(props: ContentProps) {
   }, [currentAccount, currentChain, address, id])
 
   return (
-    <Card sx={{}}>
+    <Card sx={{minWidth: 320}}>
       <CardContent>
         <Player value={value} />
       </CardContent>

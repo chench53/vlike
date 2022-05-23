@@ -20,7 +20,7 @@ export const etherContext = createContext<ethConnectionType>({
 });
 
 export const useWallet = () => {
-  const [currentAccount, setCurrentAccount] = useState<string | undefined>(ethereum.selectedAddress);
+  const [currentAccount, setCurrentAccount] = useState<string | undefined>(toChecksumAddress(ethereum.selectedAddress));
   const [currentChain, SetCurrentChain] = useState<string | undefined>(undefined);
   const [onRightChain, SetOnRightChain] = useState<boolean | undefined>(undefined);
 

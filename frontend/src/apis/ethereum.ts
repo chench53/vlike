@@ -43,7 +43,8 @@ export const getNetworkName = (chainId: string) => {
 }
 // address case insensitive
 export const toChecksumAddress = (address: string) => {
-  return web3.utils.toChecksumAddress(address)
+  const checksumAddress = web3.utils.toChecksumAddress(address)
+  return checksumAddress
 }
 
 export const getEtherConfig = async () => {

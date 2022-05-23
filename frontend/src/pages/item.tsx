@@ -52,7 +52,7 @@ export default function Item() {
       {
         (address && id) && (
           <Box>
-            <Typography>
+            <Typography sx={{ marginBottom: 1 }}>
               address: &nbsp; 
                 <Link className={palette.mode}  to={`/dashboard/${itemInfo.address}`}>
                   {itemInfo.address} 
@@ -60,7 +60,7 @@ export default function Item() {
               <br />
               id: {id}
             </Typography>
-            <Typography variant='body2' sx={{ marginBottom: 4 }}>value: {value}</Typography>
+            <Typography variant='body2' sx={{ marginBottom: 4 }}>{value}</Typography>
             <Grid container justifyContent="center" alignItems="center" gap={8} sx={{
               marginTop: 4
             }}>

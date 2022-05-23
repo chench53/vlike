@@ -42,9 +42,15 @@ export const getNetworkName = (chainId: string) => {
   return chainName
 }
 // address case insensitive
-export const toChecksumAddress = (address: string) => {
-  const checksumAddress = web3.utils.toChecksumAddress(address)
-  return checksumAddress
+export const toChecksumAddress = (address: string|undefined) => {
+  if (address) {
+    const checksumAddress = web3.utils.toChecksumAddress(address)
+    return checksumAddress
+  }
+}
+
+export const toEther = (bn: string|number) => {
+  return web3.utils.fromWei(bn, 'ether');
 }
 
 export const getEtherConfig = async () => {
@@ -91,7 +97,7 @@ export const getRatingContractBaseInfo = async (address: string) => {
       name: _baseInfo[0],
       tokenEnabled: _baseInfo[1],
       balance: _baseInfo[2],
-      linkTokenBanlance: _baseInfo[3],
+      linkTokenBanlance:  _baseInfo[3],
       owner: toChecksumAddress(_baseInfo[4])
     } as ContractBaseInfo
   } catch (e) {
@@ -104,15 +110,17 @@ export const rate = async (ratingContractAddress: string, itemId: number, rating
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], ratingContractAddress);
   const tokenEnabled = await MyContractRating.methods.tokenEnabled().call()
   if (tokenEnabled) {
-    const [stake, myBanlance] = await Promise.all([
+    const [stake, myBanlance, baseInfo] = await Promise.all([
       MyContractRating.methods.calculateRatingStake(itemId).call(),
-      contractVlikeToke.methods.balanceOf(ethereum.selectedAddress).call()
+      contractVlikeToke.methods.balanceOf(ethereum.selectedAddress).call(),
+      MyContractRating.methods.getBaseInfo().call(),
     ])
-    console.log(stake.stakeAmount)
-    console.log(myBanlance)
     console.log( Web3.utils.toWei(myBanlance, 'wei') >=  Web3.utils.toWei(stake.stakeAmount, 'wei') )
     if (Web3.utils.toWei(myBanlance, 'wei') <  Web3.utils.toWei(stake.stakeAmount, 'wei') ) {
       throw 'TokensInsufficient'
+    }
+    if (Web3.utils.toWei(baseInfo.linkTokenBanlance, 'ether') <  0.1) {
+      throw 'LinkTokensInsufficient'
     }
     await contractVlikeToke.methods.approve(ratingContractAddress, myBanlance).send({from: ethereum.selectedAddress})
   }

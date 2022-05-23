@@ -19,7 +19,12 @@ import {
 import Refresh from '@mui/icons-material/Refresh';
 
 import { etherContext } from 'apis/use_wallet';
-import { getRatingContractCount, getRatingContract, getRatingContractBaseInfo } from "apis/ethereum";
+import { 
+  getRatingContractCount, 
+  getRatingContract, 
+  getRatingContractBaseInfo,
+  toEther,
+} from "apis/ethereum";
 import { ContractDialog } from './create_contract';
 
 interface tableRow {
@@ -144,8 +149,8 @@ function RatingsTable(props: RatingsTableProps) {
               <TableCell>{row.address}</TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.tokenEnabled.toString()}</TableCell>
-              <TableCell align="right">{row.balance}</TableCell>
-              <TableCell align="right">{row.linkTokenBanlance}</TableCell>
+              <TableCell align="right">{toEther(row.balance.toString())}</TableCell>
+              <TableCell align="right">{toEther(row.linkTokenBanlance.toString())}</TableCell>
             </TableRow>
           ))}
         </TableBody>

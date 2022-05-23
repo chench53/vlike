@@ -8,7 +8,9 @@ import {
   DialogTitle,
   FormControl,
   TextField,
+  Tooltip,
 } from '@mui/material';
+import HelpIcon from '@mui/icons-material/Help';
 
 import { addItem } from 'apis/ethereum';
 import { ratingContractContext } from 'apis/hooks';
@@ -19,7 +21,13 @@ interface DialogProps {
 }
 
 export function ItemDialog(props: DialogProps) {
+
   const { onClose, open } = props;
+  const tip = `
+This form allows the user to manually add item. For demonstration purposes, this form only support page-embedded elements, which you can find in the share options of the web apps.
+For adding more general items please use the abi function which supports arbitrary string.
+Refer to our documentation for more detail.
+`
 
   const handleClose = () => {
     onClose(null);
@@ -31,7 +39,12 @@ export function ItemDialog(props: DialogProps) {
 
   return (
     <Dialog disableEscapeKeyDown onClose={handleClose} open={open}>
-      <DialogTitle>Add Item</DialogTitle>
+      <DialogTitle>
+        Add Item
+        <Tooltip title={tip} placement="bottom-start">
+          <HelpIcon fontSize="small" sx={{verticalAlign: "revert", marginLeft: 1}}/>
+        </Tooltip>
+      </DialogTitle>
       <ItemForm handleSubmited={handleSubmited}></ItemForm>
     </Dialog>
   );

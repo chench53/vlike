@@ -90,10 +90,12 @@ export default function Items(props: ItemsProps) {
         >
           Items
         </Typography>
-          <IconButton  disabled={!contractAddress} onClick={() => setRefreshKey(oldKey => oldKey +1)}>
-            <Refresh></Refresh>
-          </IconButton>
-        <Button variant='contained' sx={{whiteSpace:'nowrap'}} onClick={() => {setOpen(true)}}>Add Item</Button>
+        <IconButton  disabled={!contractAddress} onClick={() => setRefreshKey(oldKey => oldKey +1)}>
+          <Refresh></Refresh>
+        </IconButton>
+        <Button variant='contained' sx={{whiteSpace:'nowrap'}} 
+          onClick={() => {setOpen(true)}}
+        >Add Item</Button>
       </Toolbar>
       <ItemsTable dataFetched={dataFetched} rows={rows}></ItemsTable>
       <ItemDialog

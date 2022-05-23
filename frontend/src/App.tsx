@@ -169,7 +169,6 @@ function Main() {
           )
         }
         <Msg open={open} text={text} type={type} close={close}></Msg>
-
       </Box>
     </msgContext.Provider>
   )

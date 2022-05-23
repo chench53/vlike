@@ -14,7 +14,8 @@ import {
   ContractBaseInfo, 
   getDefalutContractBaseInfo,
   getRatingContractBaseInfo, 
-  ratingEnableToken 
+  ratingEnableToken,
+  toEther
 } from 'apis/ethereum';
 import { etherContext } from 'apis/use_wallet';
 
@@ -66,8 +67,8 @@ export default function Dashboard() {
               address: {contractAddress} <br/>
               name: {baseInfo.name} <br/>
               token enabled: {baseInfo.tokenEnabled.toString()}<br/>
-              balance: {baseInfo.balance} <br/>
-              Link token banlance: {baseInfo.linkTokenBanlance} <br/>
+              balance: {toEther(baseInfo.balance.toString())} <br/>
+              Link token banlance: {toEther(baseInfo.linkTokenBanlance.toString())} <br/>
             </Typography>
             {
               (contractAddress && !baseInfo.tokenEnabled && baseInfo.owner)?(

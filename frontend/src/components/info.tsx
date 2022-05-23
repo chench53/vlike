@@ -86,7 +86,8 @@ export default function Info(props: InfoProps) {
       console.error(e)
       if (e==='TokensInsufficient') {
         show('Insufficient vlike tokens', 'error')
-      }
+      } else if (e==="LinkTokensInsufficient")
+        show("The contract doesn't have enough link tokens ", "error")
     })
   }
 

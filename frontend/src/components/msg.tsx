@@ -24,7 +24,7 @@ export default function Msg (props: msgProps) {
 
   return (
     <Snackbar 
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} 
       open={open} 
       autoHideDuration={8000} 
       onClose={handleClose}

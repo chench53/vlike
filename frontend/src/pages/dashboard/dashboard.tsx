@@ -28,6 +28,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (contractAddress && currentAccount) {
       getRatingContractBaseInfo(contractAddress||'').then(data => {
+        console.log(data)
         setBaseInfo(data);
       })
     }

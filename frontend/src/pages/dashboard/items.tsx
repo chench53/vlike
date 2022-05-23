@@ -17,6 +17,7 @@ import {
   Paper
 } from '@mui/material';
 import Refresh from '@mui/icons-material/Refresh';
+import HelpIcon from '@mui/icons-material/Help';
 
 import { ItemDialog } from './item_dlg';
 import { getItemsCount, getItem } from 'apis/ethereum';
@@ -85,10 +86,11 @@ export default function Items(props: ItemsProps) {
         <Typography
           sx={{ flex: '1 1 100%' }}
           variant="h6"
-          id="tableTitle"
-          component="div"
         >
           Items
+          <Tooltip title='The table shows 5 recently added items' placement="top">
+            <HelpIcon fontSize="small" sx={{marginLeft: 1}}/>
+          </Tooltip>
         </Typography>
         <IconButton  disabled={!contractAddress} onClick={() => setRefreshKey(oldKey => oldKey +1)}>
           <Refresh></Refresh>

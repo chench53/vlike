@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link } from "react-router-dom";
-
 import {
   Box,
   Button,
@@ -13,10 +12,12 @@ import {
   TableHead,
   TableRow,
   Toolbar,
+  Tooltip,
   Typography,
   Paper
 } from '@mui/material';
 import Refresh from '@mui/icons-material/Refresh';
+import HelpIcon from '@mui/icons-material/Help';
 
 import { etherContext } from 'apis/use_wallet';
 import { 
@@ -96,10 +97,11 @@ export default function Devs() {
         <Typography
           sx={{ flex: '1 1 100%' }}
           variant="h6"
-          id="tableTitle"
-          component="div"
         >
           My Rating Contracts
+          <Tooltip title='The table shows 5 recently created contracts' placement="top">
+            <HelpIcon fontSize="small" sx={{marginLeft: 1}}/>
+          </Tooltip>
         </Typography>
           <IconButton disabled={!currentAccount} onClick={handleGetRatingContract}>
             <Refresh></Refresh>
@@ -133,8 +135,8 @@ function RatingsTable(props: RatingsTableProps) {
             <TableCell>Address</TableCell>
             <TableCell >Name</TableCell>
             <TableCell >Token enabled</TableCell>
-            <TableCell >Balance</TableCell>
-            <TableCell >Link Balance</TableCell>
+            <TableCell align="right">Balance</TableCell>
+            <TableCell align="right">Link Balance</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

@@ -48,9 +48,9 @@ export const toChecksumAddress = (address: string|undefined) => {
     return checksumAddress
   }
 }
-
+// for display
 export const toEther = (bn: string|number) => {
-  return web3.utils.fromWei(bn, 'ether');
+  return +parseFloat(web3.utils.fromWei(bn, 'ether')).toFixed(4);
 }
 
 export const getEtherConfig = async () => {
@@ -93,6 +93,7 @@ export const getRatingContractBaseInfo = async (address: string) => {
   const MyContractRating = new web3.eth.Contract(abi_rating as AbiItem[], address);
   try {
     const _baseInfo = await MyContractRating.methods.getBaseInfo().call();
+    // console.log(_baseInfo)
     return {
       name: _baseInfo[0],
       tokenEnabled: _baseInfo[1],
@@ -115,8 +116,7 @@ export const rate = async (ratingContractAddress: string, itemId: number, rating
       contractVlikeToke.methods.balanceOf(ethereum.selectedAddress).call(),
       MyContractRating.methods.getBaseInfo().call(),
     ])
-    console.log( Web3.utils.toWei(myBanlance, 'wei') >=  Web3.utils.toWei(stake.stakeAmount, 'wei') )
-    if (Web3.utils.toWei(myBanlance, 'wei') <  Web3.utils.toWei(stake.stakeAmount, 'wei') ) {
+    if (myBanlance < stake.stakeAmount) {
       throw 'TokensInsufficient'
     }
     if (Web3.utils.toWei(baseInfo.linkTokenBanlance, 'ether') <  0.1) {
@@ -127,9 +127,6 @@ export const rate = async (ratingContractAddress: string, itemId: number, rating
   return await MyContractRating.methods.rate(itemId, !!rating).send({from: ethereum.selectedAddress})
 }
 
-// export const computeRatingCost = async (MyContractRating: web3.eth.Contract, itemId: number) => {
-
-// }
 
 export const createRating = async (name: string, enableTokenAtInit: boolean) => {
   const { vrfCoordinator, linkToken, keyhash } = await getEtherConfig();

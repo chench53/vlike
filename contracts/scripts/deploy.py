@@ -143,4 +143,5 @@ def main():
     _setup(token_contract, rating_factory_contract, default_deployment_config)
     _write_frontend_end_env(token_contract, rating_factory_contract)
     _write_frontend_end_abi(VlikeToken, Rating, RatingFactory)
-    _write_frontend_end_mock()
+    if network.show_active() in LOCAL_BLOCKCHAIN:
+        _write_frontend_end_mock()

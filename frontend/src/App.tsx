@@ -15,7 +15,7 @@ import './App.css';
 
 import { useWallet, etherContext } from './apis/use_wallet';
 import { useTokenContext, msgContext, useMsg } from './apis/hooks';
-import { getTokenBalance } from './apis/ethereum';
+import { getTokenBalance, toEther } from './apis/ethereum';
 
 
 const routes = [
@@ -78,8 +78,9 @@ function App() {
     if (currentAccount && onRightChain) {
       getTokenBalance().then(x => { // string
         try {
-          const balanceInWei = parseInt(x);
-          setBalance(balanceInWei / (10 ** 18));
+          // const balanceInWei = parseInt(x);
+          // setBalance(balanceInWei / (10 ** 18));
+          setBalance(toEther(x.toString()))
         } catch (error) {
           console.error(error);
         }

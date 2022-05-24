@@ -28,9 +28,17 @@ export default function Examples() {
 
   return (
     <Container sx={{paddingBottom: 4}}>
-      <ContractExample address={address0} itemsArray={[0, 1]}/>
+      <ContractExample 
+        address={address0} 
+        itemsArray={[0, 1]}
+        desc="Token not enabled"
+      />
       <Divider/>
-      <ContractExample address={address1} itemsArray={[0]}/>
+      <ContractExample 
+        address={address1} 
+        itemsArray={[0]}
+        desc="Token enabled"
+      />
     </Container>
   )
 }
@@ -38,11 +46,12 @@ export default function Examples() {
 interface contractExampleProps {
   address: string,
   itemsArray: number[],
+  desc: string,
 }
 
 function ContractExample(props: contractExampleProps) {
 
-  const { address, itemsArray } = props;
+  const { address, itemsArray, desc } = props;
 
   return (
     <Box sx={{
@@ -50,7 +59,7 @@ function ContractExample(props: contractExampleProps) {
       marginBottom: 4
     }}>
       <Typography>
-        Address: {address}
+        Address: {address}. {desc}
       </Typography>
       <Grid container alignItems="center" gap={16} sx={{
         marginTop: 4

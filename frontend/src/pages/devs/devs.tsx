@@ -135,7 +135,7 @@ function RatingsTable(props: RatingsTableProps) {
             <TableCell>Address</TableCell>
             <TableCell >Name</TableCell>
             <TableCell >Token enabled</TableCell>
-            <TableCell align="right">Balance</TableCell>
+            <TableCell align="right">Vlike Balance</TableCell>
             <TableCell align="right">Link Balance</TableCell>
           </TableRow>
         </TableHead>

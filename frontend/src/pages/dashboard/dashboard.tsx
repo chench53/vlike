@@ -68,8 +68,8 @@ export default function Dashboard() {
               address: {contractAddress} <br/>
               name: {baseInfo.name} <br/>
               token enabled: {baseInfo.tokenEnabled.toString()}<br/>
-              balance: {toEther(baseInfo.balance.toString())} <br/>
-              Link token banlance: {toEther(baseInfo.linkTokenBanlance.toString())} <br/>
+              Vlike token balance: {toEther(baseInfo.balance.toString())} <br/>
+              Link token balance: {toEther(baseInfo.linkTokenBanlance.toString())} <br/>
             </Typography>
             {
               (contractAddress && !baseInfo.tokenEnabled && baseInfo.owner)?(

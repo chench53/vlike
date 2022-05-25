@@ -16,6 +16,7 @@ import {
   Typography,
   Paper
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Refresh from '@mui/icons-material/Refresh';
 import HelpIcon from '@mui/icons-material/Help';
 
@@ -35,9 +36,7 @@ interface ItemsProps {
 
 export default function Items(props: ItemsProps) {
 
-
   const { contractAddress } = useContext(ratingContractContext);
-
   const [ dataFetched, setDataFetched ] = useState(true);
   const [ open, setOpen ] = useState(false);
   const [ rows, setRows ] = useState<tableRow[]>([])
@@ -83,10 +82,7 @@ export default function Items(props: ItemsProps) {
           pr: { xs: 1, sm: 1 }
         }}
       >
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-        >
+        <Typography variant="h6" sx={{ flex: '1 1 100%' }}>
           Items
           <Tooltip title='The table shows 5 recently added items' placement="top">
             <HelpIcon fontSize="small" sx={{marginLeft: 1}}/>
@@ -117,21 +113,22 @@ function ItemsTable(props: TableProps) {
 
   const { dataFetched, rows } = props;
   const { contractAddress } = useContext(ratingContractContext);
+  const { palette } = useTheme()
 
-  function shortValue(value: string) {
-    const parser = new DOMParser();
-    var htmlDoc = parser.parseFromString(value, 'text/html');
-    var tag = htmlDoc.body.firstElementChild?.nodeName;
-    if (tag) {
-      tag = `<${tag.toLowerCase()}>...`
-    }
-    return tag;
-  }
+  // function shortValue(value: string) {
+  //   const parser = new DOMParser();
+  //   var htmlDoc = parser.parseFromString(value, 'text/html');
+  //   var tag = htmlDoc.body.firstElementChild?.nodeName;
+  //   if (tag) {
+  //     tag = `<${tag.toLowerCase()}>...`
+  //   }
+  //   return tag;
+  // }
 
   return (
     <TableContainer component={Paper}>
       { dataFetched ? '' : <LinearProgress sx={{ width: '100%'}}/> }
-      <Table sx={{ minWidth: 'md' }} >
+      <Table sx={{ minWidth: 'md', tableLayout: 'fixed' }} >
         <TableHead>
           <TableRow>
             <TableCell style={{ width: 40 }}>id</TableCell>
@@ -142,31 +139,29 @@ function ItemsTable(props: TableProps) {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
-              key={row.id}
-              component={Link} to={`/dashboard/${contractAddress}/item/${row.id}`}
-              sx={{ 
-                textDecoration: 'none'
-              }}
-            >
+            <TableRow key={row.id}>
               <TableCell>
-                {row.id}
+                  {row.id}
               </TableCell>
               <TableCell sx={{
               }}>
-                {/* <Button> */}
                 <Tooltip title={row.value}>
                   <Typography sx={{
-                    width: 'calc(100%*0.20)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: "nowrap"
                   }}>
-                    {shortValue(row.value)}
-
+                    <Link 
+                      className={palette.mode} 
+                      to={`/dashboard/${contractAddress}/item/${row.id}`}
+                      style={{
+                        textDecoration: 'none',
+                      }} 
+                    >
+                      {row.value}
+                    </Link>
                   </Typography>
                 </Tooltip>
-                {/* </Button> */}
               </TableCell>
               <TableCell align="right">{row.like}</TableCell>
               <TableCell align="right">{row.dislike}</TableCell>

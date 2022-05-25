@@ -4,6 +4,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   Typography,
 } from '@mui/material';
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const { contractAddress } = useParams();
   const { currentAccount } = useContext(etherContext);
   const [ baseInfo, setBaseInfo ] = useState<ContractBaseInfo>(getDefalutContractBaseInfo())
+  const [ enableLoading,  setEnableLoading] = useState(false);
 
   useEffect(() => {
     if (contractAddress && currentAccount) {
@@ -36,10 +38,14 @@ export default function Dashboard() {
 
   function enableToken() {
     if(contractAddress) {
+      setEnableLoading(true);
       ratingEnableToken(contractAddress).then(() => {
+        setEnableLoading(false);
         getRatingContractBaseInfo(contractAddress||'').then(data => {
           setBaseInfo(data);
         })
+      }, e => {
+        setEnableLoading(false);
       })
     }
   }
@@ -76,7 +82,8 @@ export default function Dashboard() {
                 <Button 
                   variant="contained" 
                   color="warning" 
-                  disabled={baseInfo.owner !== currentAccount}
+                  disabled={(baseInfo.owner !== currentAccount) || enableLoading}
+                  endIcon={enableLoading?<CircularProgress size={20}/>:''}
                   onClick={enableToken}
                 >Enable Token</Button>
               ):''

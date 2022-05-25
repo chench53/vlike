@@ -2,10 +2,13 @@
 
 ## Env
 
-create .env.local file
 ```
-REACT_APP_API_URL={local testnet host}
-REACT_APP_CONTRACT_RATING={local contract address}
+REACT_APP_API_URL=
+REACT_APP_CHAIN_NETWORK=
+REACT_APP_CONTRACT_RATING_FACTORY=
+REACT_APP_CHAIN_NETWORK=dev
+REACT_APP_CONTRACT_VLIKE_TOKEN=
+REACT_APP_ADMIN_ADDRESS=
 ```
 
 ## Available Scripts

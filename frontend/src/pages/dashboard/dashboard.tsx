@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
@@ -19,18 +18,23 @@ import {
   toEther
 } from 'apis/ethereum';
 import { etherContext } from 'apis/use_wallet';
+import { msgContext } from 'apis/hooks';
 
 export default function Dashboard() {
 
   const { contractAddress } = useParams();
   const { currentAccount } = useContext(etherContext);
+  const { show } = useContext(msgContext);
   const [ baseInfo, setBaseInfo ] = useState<ContractBaseInfo>(getDefalutContractBaseInfo())
   const [ enableLoading,  setEnableLoading] = useState(false);
 
   useEffect(() => {
     if (contractAddress && currentAccount) {
       getRatingContractBaseInfo(contractAddress||'').then(data => {
-        console.log(data)
+        if (data.owner !== currentAccount) {
+          console.error(data.owner, currentAccount)
+          show("You are not the owner of this contract. ", "error")
+        }
         setBaseInfo(data);
       })
     }
@@ -53,16 +57,6 @@ export default function Dashboard() {
   return (
     <ratingContractContext.Provider value={{contractAddress: contractAddress || ''}}>
       <Box sx={{marginTop: 2}}>
-        {
-          (baseInfo.owner && baseInfo.owner !== currentAccount) ? (
-            <Alert severity="error" variant="filled" sx={{
-                width: 'max-content', 
-                position: 'absolute'
-              }}>
-                You are not the owner of this contract.
-              </Alert>
-          ) : ''
-        }
         <Container maxWidth="md">
           <Box sx={{
             marginBottom: 2, 

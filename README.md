@@ -5,20 +5,26 @@
 ---
 
 Vlike is the proof of concept of a decentralized rating system.
-Please check this [gitbook](https://chench53.gitbook.io/hackathon/) for more details.
+Please check this [gitbook](https://chench53.gitbook.io/hackathon/) for more details. View our demo [Vlike](http://vlike.frontiech.com/) deployed on rinkeby testnet.
 
+![Screen](screen.png)
+ 
 ## Project structure
 
 ```
 | README.md
 |-contracts
   | README.md
+  | .env
   |-contracts
   |-interfaces
   |-scipts
   |...
 |-frontend
   | README.md
+  | env
+  | env.local
+  |-public
   |-src
   | ...
 ```
@@ -41,7 +47,7 @@ To start developing locally, please:
 
     `run('scripts/deploy')`
 
-     It would write a `.env.development.local` file in /frontend with the addresses of contracts.
+    It would write a `.env.development.local` file in /frontend with the addresses of contracts.
 
 3. Run frontend in the development mode. In /frontend: 
 
@@ -49,7 +55,7 @@ To start developing locally, please:
 
     Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-4. Connect wallet to local:8545, import a ganache generated test account with 100 ether.
+4. Connect wallet to local:8545, import some ganache generated test accounts into MetaMask.
 
 Then you can interact with local contracts in this local web page.
 
@@ -62,38 +68,36 @@ To deploy this project:
 
     `brownie run .\scripts\deploy.py  --network rinkeby`
 
-    get the Rating contract address on rinkeby.
-  
-2. Create .env.local file in /frontend:
-
-    ```
-    REACT_APP_API_URL=REACT_APP_API_URL=/chain
-    REACT_APP_CONTRACT_RATING={the Rating contract address}
-    ... 
-    ```
-
-    Since .env.local has higher priority than .env, the better practice is to assign a separate deployment server with different .env.local.
+    It would write a `.env.production.local` file in /frontend with the addresses of contracts on rinkeby.
 
 3. Build frontend to the /frontend folder:
 
     `npm run build`
 
-4. On a server, use nginx or apache to serve files in /frontend/build, add this proxy rule:
+    Serve files in /frontend/build on a web server.
 
-    ```
-    location /chain {
-        proxy_pass https://rinkeby.infura.io/v3/bbf6b774ab29429d98322d03c268f5e8;
-    }
-    ```
 
-## Demo
+## Vlike Token
 
-The addresses of the contracts currently deployed on the testnet:
+The service provider can decide whether or not to enable tokens in their application.The incentive of this token is: that it encourages viewers to give good feedback. 
 
-- Rating [0x9f5518A4A5958Ac5a202e8Ca9488517250001753](https://rinkeby.etherscan.io/address/0x9f5518A4A5958Ac5a202e8Ca9488517250001753)
-- Token 0xCAadB6ED550E18800AC309A8c1Fb1362877a4Bf5
-- RatingFactory 0x825B3e6948ca38a3905c0691567FFbC0cb865017
+We implement a random periodic lottery for every item/content that can be rated. This is roughly how it works:
 
-The web page deployed 
+1. A viewer pays a certain amount of tokens every time a viewer gives a rating. The tokens this rater paid will be transferred into a pool. The earlier raters pay more than the later ones.
 
-- [Vlike](http://vlike.frontiech.com/)
+2. In the meantime, the rater will vote a certain weight to a random rater who has the same rating as the latter one. The later raters have a higher vote weight.
+
+3. Roll a random number to decide when the lottery ends. Choose the winner base on the raters' votes they have received. The tokens in the pool will be transferred to the winner. The service provider can charge a certain percentage of fees.
+
+4.  Restart this lottery for another round.
+
+![plot](plot.png)
+
+## Contracts
+
+- Vlike Token, the ERC20 token contract
+- Rating Contract Factory, the factory contract can create new rating contract.
+- Rating Contract, the Contact keep track of users' rating data.
+- Pool, the token pool of a rating contract.
+
+![contracts](contracts.png)

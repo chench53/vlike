@@ -44,7 +44,6 @@ export const useMsg = () => {
     | 'info'
     | 'success'
     | 'warning') => {
-    console.log(text);
     setOpen(true)
     setText(text);
     setType(type);

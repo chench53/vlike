@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogTitle,
@@ -64,6 +65,7 @@ function ItemForm(props: ItemFormProps) {
   const { contractAddress } = useContext(ratingContractContext);
   const [ valid, setValid ] = useState(false);
   const [ model, setModel ] = useState<ModelType>(getDefaultModel())
+  const [ loading, setLoading ] = useState(false);
 
   useEffect(() => {
     if (model.value && checkValueValid(model.value)) {
@@ -90,11 +92,14 @@ function ItemForm(props: ItemFormProps) {
   }
   
   async function submit() {
+    setLoading(true);
     addItem(contractAddress, model.value).then(x => {
       handleSubmited(x);
+      setLoading(false);
     }, error => {
       console.error(error);
       handleSubmited(null);
+      setLoading(false);
     })
   }
 
@@ -122,8 +127,24 @@ function ItemForm(props: ItemFormProps) {
         marginTop: 4,
         textAlign: 'end'
       }}>
-        <Button variant="contained" color="secondary" onClick={clear} sx={{marginRight:2}}>clear</Button>
-        <Button variant="contained" disabled={!valid} onClick={submit}>submit</Button>
+        <Button 
+          variant="contained" 
+          color="secondary"
+          disabled={loading}
+          onClick={clear} 
+          sx={{marginRight:2}}
+        >clear</Button>
+        {
+          loading ? (
+            <Button
+              variant="contained" 
+              disabled={true}
+              endIcon={<CircularProgress size={20}/>} 
+            >submit</Button>
+          ) : (
+            <Button variant="contained" disabled={!valid} onClick={submit}>submit</Button>
+          )
+        }
       </Box>
     </Container>
   )

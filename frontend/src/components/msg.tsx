@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
 interface msgProps {

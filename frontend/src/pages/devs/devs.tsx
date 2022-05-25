@@ -16,6 +16,7 @@ import {
   Typography,
   Paper
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Refresh from '@mui/icons-material/Refresh';
 import HelpIcon from '@mui/icons-material/Help';
 
@@ -125,6 +126,7 @@ interface RatingsTableProps {
 function RatingsTable(props: RatingsTableProps) {
 
   const { dataFetched, rows } = props;
+  const { palette } = useTheme()
 
   return (
     <TableContainer component={Paper}>
@@ -143,12 +145,12 @@ function RatingsTable(props: RatingsTableProps) {
           {rows.map((row) => (
             <TableRow
               key={row.address}
-              component={Link} to={`/dashboard/${row.address}/`}
-              sx={{ 
-                textDecoration: 'none'
-              }}
               >
-              <TableCell>{row.address}</TableCell>
+              <TableCell>
+                <Link className={palette.mode} to={`/dashboard/${row.address}/`}>
+                  {row.address}
+                </Link>
+              </TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.tokenEnabled.toString()}</TableCell>
               <TableCell align="right">{toEther(row.balance.toString())}</TableCell>

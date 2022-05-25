@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
@@ -17,14 +17,15 @@ interface RatingOptionProps {
   ratingOptionValue: number,
   ratingCount: number,
   icon: any,
+  loading: boolean,
 }
 
 function RatingOption(props: RatingOptionProps) {
-  const { address, hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon } = props;
+  const { address, hasRated, myRating, giveRating, ratingOptionValue, ratingCount, icon, loading } = props;
   const Icon = icon;
   return (
     <Box>
-      <IconButton disabled={hasRated || !ethereum.selectedAddress || !address} onClick={() => giveRating(ratingOptionValue)}>
+      <IconButton disabled={hasRated || !ethereum.selectedAddress || !address || loading} onClick={() => giveRating(ratingOptionValue)}>
         <Icon color={myRating === ratingOptionValue ? 'primary' : undefined} />
       </IconButton>
       {ratingCount}
@@ -45,7 +46,8 @@ export default function Info(props: InfoProps) {
   const [ ratingCount, setRatingCount ] = useState([0, 0])
   const { currentAccount, currentChain } = useContext(etherContext);
   const { refreshToken } = useContext(useTokenContext);
-  const { show, text, open } = useContext(msgContext)
+  const { show } = useContext(msgContext);
+  const [ loading, setLoading ] = useState(false);
 
   const ratingOptions = [
     {
@@ -80,14 +82,18 @@ export default function Info(props: InfoProps) {
   }
 
   function giveRating(score: number) {
+    setLoading(true);
     rate(address, itemId, score).then(() => {
       fetchCurrentRatingInfo()
+      setLoading(false);
     }, e => {
       console.error(e)
       if (e==='TokensInsufficient') {
         show('Insufficient vlike tokens', 'error')
-      } else if (e==="LinkTokensInsufficient")
+      } else if (e==="LinkTokensInsufficient"){
         show("The contract doesn't have enough link tokens ", "error")
+      }
+      setLoading(false);
     })
   }
 
@@ -104,7 +110,8 @@ export default function Info(props: InfoProps) {
       <Typography variant='subtitle1'>
       id: {itemId}
       </Typography>
-      <Box sx={{display: 'flex', gap: 2}}>
+      <Box sx={{display: 'flex', alignItems:"center", gap: 2}}>
+        {loading?<CircularProgress size={20}/>:''}
         {
           ratingOptions.map(x => {
             return (
@@ -117,6 +124,7 @@ export default function Info(props: InfoProps) {
                 ratingOptionValue={x.value} 
                 ratingCount={ratingCount[x.value]}
                 icon={x.icon}
+                loading={loading}
               ></RatingOption>
             )
           })

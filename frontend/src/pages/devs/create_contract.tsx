@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
   Dialog,
   DialogTitle,
@@ -11,6 +12,8 @@ import {
   FormControlLabel,
   TextField,
 } from '@mui/material';
+// import LoadingButton from '@mui/lab/LoadingButton';
+import SendIcon from '@mui/icons-material/Send';
 
 import { createRating } from 'apis/ethereum';
 
@@ -45,6 +48,7 @@ interface RatingFormProps {
 function RatingForm(props: RatingFormProps) {
 
   const { handleSubmited } = props;
+  const [ loading, setLoading ] = useState(false);
   
   interface modeType {
     name: string;
@@ -66,11 +70,14 @@ function RatingForm(props: RatingFormProps) {
   }, [model.name])
 
   async function formSubmit() {
+    setLoading(true);
     createRating(model.name, model.enableTokenAtInit).then(x => {
       handleSubmited(x);
+      setLoading(false);
     }, error => {
       console.error(error);
       handleSubmited(null);
+      setLoading(false);
     })
   }
 
@@ -99,7 +106,21 @@ function RatingForm(props: RatingFormProps) {
           />
         </FormControl>
         <Box sx={{ marginTop: 4, textAlign:'end' }}>
-          <Button variant="contained" disabled={!valid} onClick={formSubmit}>Create</Button>
+          {
+            loading ? (
+              <Button
+                variant="contained" 
+                disabled={true}
+                endIcon={<CircularProgress size={20}/>} 
+              >Create</Button>
+            ) : (
+              <Button 
+                variant="contained" 
+                disabled={!valid} 
+                onClick={formSubmit}
+              >Create</Button>
+            )
+          }
         </Box>
       </Box>
     </Container>

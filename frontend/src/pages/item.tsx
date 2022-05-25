@@ -21,7 +21,7 @@ export default function Item() {
   let { address, id } = useParams();
   const { palette } = useTheme()
   const [ itemInfo, setItemInfo ] = useState<itemInfoType>({address: '', id: 0})
-  const [ value, setValue] = useState('')
+  // const [ value, setValue] = useState('')
 
   useEffect(() => {
     if (address && id) {
@@ -36,12 +36,12 @@ export default function Item() {
           id: _id
         }}
       })
-      getItem(_address, _id).then(data => {
-        console.log(data);
-        if (data && data.urlData) {
-          setValue(data.urlData);
-        }
-      })
+      // getItem(_address, _id).then(data => {
+      //   console.log(data);
+      //   if (data && data.urlData) {
+      //     setValue(data.urlData);
+      //   }
+      // })
     }
   }, [address, id])
 

@@ -48,6 +48,9 @@ export const toChecksumAddress = (address: string|undefined) => {
     return checksumAddress
   }
 }
+
+// console.log(toChecksumAddress('0x60e45c27419a7cd47576fee0d15ba3e26a6b86d4'))
+// console.log(toChecksumAddress('0x60e45C27419a7cd47576fEe0d15ba3e26a6b86D4'))
 // for display
 export const toEther = (bn: string|number) => {
   return +parseFloat(web3.utils.fromWei(bn, 'ether')).toFixed(4);

@@ -72,7 +72,7 @@ export const connectWallet = async (handlerSetAccout: ((account: string)=>void) 
     const [account] = await ethereum.request({ method: 'eth_requestAccounts' });
     console.log(`account connect: ${account}`)
     if (handlerSetAccout) {
-      handlerSetAccout(account);
+      handlerSetAccout(toChecksumAddress(account));
     }
   } catch (err) {
     console.log(err);

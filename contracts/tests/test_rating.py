@@ -53,18 +53,6 @@ class TestRating():
         user1 = get_account(1)
     
         name = 'unittest'
-        # rating_contract = deplopy_contract(
-        #     Rating,
-        #     name,
-        #     token_contract,
-        #     False,
-        #     100,
-        #     5,
-        #     get_contract("vrf_coordinator").address,
-        #     get_contract("link_token").address,
-        #     config["networks"][network.show_active()]["keyhash"],
-        #     get_account()
-        # )
 
         rating_factory_contract.createRatingSystemContract(
             name,
@@ -108,7 +96,7 @@ class TestRating():
         user1 = get_account(1)
         user2 = get_account(2)
 
-        rating_factory_contract.createRatingSystemContract(
+        create_tx = rating_factory_contract.createRatingSystemContract(
             'dev',
             token_contract, 
             True,
@@ -118,11 +106,14 @@ class TestRating():
             get_contract("link_token").address,
             config["networks"][network.show_active()]["keyhash"],
             {'from': account}
-        ).wait(1)
+        )
+        create_tx.wait(1)
 
-        rating_contract = _get_rating(rating_factory_contract, account, 0)
-
+        # rating_contract = _get_rating(rating_factory_contract, account, 0)
+        rating_contract_address = create_tx.events['createRatingEvent']['ratingContract']
+        rating_contract = Contract.from_abi('rating', rating_contract_address, Rating.abi)
         pools_contract_address = rating_contract.pools()
+        # breakpoint()
         pools_contract = Contract.from_abi('pools', pools_contract_address, Pools.abi)
         itemId = add_items(rating_contract, "abc")['items'][0]['id']
         fund_with_link(rating_contract.address)

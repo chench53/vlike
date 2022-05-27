@@ -103,6 +103,11 @@ contract Rating is VRFConsumerBase {
         }
     }
 
+    /**
+    * @dev enable Vlike token of this contract.
+    * Requirements:
+    * - token must not have been enabled in this contract.
+    */
     function enableToken() external onlyOwner {
         _enableToken();
     }
@@ -112,7 +117,9 @@ contract Rating is VRFConsumerBase {
         pools = new Pools(token);
         tokenEnabled = true;
     }
-
+    /**
+    * @dev Returns the base information of contract.
+    */
     function getBaseInfo() external view returns (BaseInfo memory baseInfo) {
         return BaseInfo(
             name, 
@@ -123,8 +130,10 @@ contract Rating is VRFConsumerBase {
         );
     }
 
-    // consider only owner visibility. Do users register items that they want to rate
-    // or do we provide the items? We only want an item to be registered once. 
+    /**
+    * @dev register an item in this rating contract.
+    * @param _urlData The value of this item, could be any string.
+    */
     function registerItem(string memory _urlData) public returns(uint256) {
         Item memory item = Item(
             itemIdCounter, 
@@ -141,7 +150,16 @@ contract Rating is VRFConsumerBase {
         return item.itemID;
     }
 
-    function rate(uint256 _itemId, bool _score) public returns(bool success){
+    /**
+    * @dev Rate an item.
+    * @param _itemId The id of this item.
+    * @param _score The value of rating.
+    * Emits a {rateEvent} event.
+    * Emits a {stakeEvent} event if token enabled.
+    * Requirements:
+    * - This item must not have been rated.
+    */
+    function rate(uint256 _itemId, bool _score) public returns(bool success) {
         require(userRating[msg.sender][_itemId].hasRated == false, 'Cannot rate twice!');
 
         if (tokenEnabled == true) {
@@ -175,7 +193,10 @@ contract Rating is VRFConsumerBase {
 
         emit stakeEvent(_itemId, msg.sender, requestId);
     }
-
+    /**
+    * @dev Returns the rating counts of the item.
+    * @param _itemId The id of this item.
+    */
     function getRatingCount(uint256 _itemId) public view returns (uint256 dCount, uint256 lCount) {
         lCount = itemMapping[_itemId].likeCount;
         dCount = itemMapping[_itemId].dislikeCount;

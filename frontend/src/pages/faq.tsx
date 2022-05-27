@@ -9,11 +9,11 @@ export default function Faq() {
     },
     {
       q: 'How can I integrate Vlike rating as a developer?',
-      a: 'You can use RatingFactory contract to deploy your own rating contract. Register items on the rating contract, and accept viewers\' rating data',
+      a: 'You can use RatingFactory contract to deploy your own rating contract. Register items on the rating contract, and accept viewers\' rating data.',
     },
     {
       q: 'What does it cost for a user to rate an item?',
-      a: 'If the rating contract deesn\'t enable token, the user only need to pay the gas fee. If the rating contract enable token, the user need to pay extra Vlike tokens, and the rating contract need some Link tokens to call Chainlink vrf'
+      a: 'If the rating contract has not enabled token, the user only need to pay the gas fee. If the rating contract enable token, the user need to pay extra Vlike tokens, and the rating contract need some Link tokens to call Chainlink vrf.'
     },
     {
       q: 'What is Vlike token?',
@@ -22,6 +22,10 @@ export default function Faq() {
     {
       q: 'What does "good feedback" mean?',
       a: 'The way we define "good feedback": feedback on certain content is considered good if this feedback is consistent with future long-term ratings of this content. So better feedback should be earlier than other ratings and predict future feedback.'
+    },
+    {
+      q: 'If token has been enabled, how does the rating contract reward the rater? ',
+      a: 'Roughly a random periodic lottery is implemented for every item/content that can be rated. The "good" ratings have higher probability of being rewarded, and the rating contract can charge a percentage of transaction fees.'
     },
     {
       q: "Where can I find more detail about this project?",

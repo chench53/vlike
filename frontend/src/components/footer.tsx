@@ -1,8 +1,9 @@
 import { IconButton, Box } from '@mui/material';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+// import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import ArticleIcon from '@mui/icons-material/Article';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import logo from '../logo.svg';
+// import logo from '../logo.svg';
 
 
 interface BottomNavProps {
@@ -27,14 +28,14 @@ export default function Footer(props: FooterProps) {
 
   const bottomNavBtnData = [
     {
-      name: 'youtube',
-      icon: YouTubeIcon,
-      href: 'https://www.youtube.com/watch?v=lRba55HTK0Q'
+      name: 'gitbook',
+      icon: ArticleIcon,
+      href: 'https://chench53.gitbook.io/hackathon/'
     },
     {
-      name: 'gitbook',
-      icon: CurrencyExchangeIcon,
-      href: 'https://chench53.gitbook.io/hackathon/tokenomics'
+      name: 'youtube',
+      icon: YouTubeIcon,
+      href: 'https://youtu.be/_4TOf9y1J20'
     },
     {
       name: 'github',
@@ -45,9 +46,9 @@ export default function Footer(props: FooterProps) {
 
   return (
       <Box position="relative" sx={{ height: 125, borderTop: 1, borderColor: 'divider', top: 'auto', bottom: 1}}>
-        <Box position='relative' sx={{ marginLeft: 15, bottom: -63, height: 57, width: 57 }}>
+        {/* <Box position='relative' sx={{ marginLeft: 15, bottom: -63, height: 57, width: 57 }}>
           <a target="_blank"  rel="noreferrer" href='https://chench53.gitbook.io/hackathon/'><img src={logo} alt=''/></a>
-        </Box>
+        </Box> */}
         <Box sx={{ marginLeft: 4, display: 'flex'}} >
           <p>&copy; Vlike 2022</p>
           <Box sx={{ display: 'flex', gap: 1, marginLeft: 6}}>
